@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI-SEM</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header class="topbar">
+  <img class="brand-logo" src="{{ url_for('static', filename='img/logo-ai-sem-icon.png') }}" alt="AI-SEM">
+  <div class="brand"><span>AI-SEM</span><small class="brand-slogan">AI-Enabled for SEM</small></div>
+  <div class="hint" style="margin:0" data-i18n="sens_page_title">Phân tích độ nhạy theo cỡ mẫu</div>
+  <div class="lang-switch" id="langSwitch">
+    <button class="lang-btn" data-lang="vi">VI</button>
+    <button class="lang-btn active" data-lang="en">EN</button>
+  </div>
+  <button class="btn ghost" id="closeTabBtn" data-i18n="sens_close_tab">✕ Đóng tab này</button>
+</header>
+
+<main class="standalone-page">
+  <div id="sensLoading" class="panel-card standalone-status">
+    <p data-i18n="sens_loading">Đang chạy lại mô hình với các cỡ mẫu khác nhau…</p>
+    <p id="sensLoadingEta" class="eta-line hidden"></p>
+  </div>
+  <div id="sensError" class="panel-card standalone-status hidden"></div>
+
+  <div id="sensContent" class="hidden">
+    <div class="panel-card">
+      <h2 data-i18n="sens_summary_title">Tổng quan</h2>
+      <p class="hint" id="sensSummary"></p>
+      <div class="export-buttons">
+        <button class="btn" id="sensAiReportBtn" data-i18n="s3_ai_report_btn">🤖 Báo cáo AI</button>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <h2 data-i18n="sens_r2_chart_title">R² theo cỡ mẫu (biến nội sinh)</h2>
+      <p class="hint" data-i18n="sens_chart_hint">Di chuột vào biểu đồ để xem giá trị chính xác tại từng cỡ mẫu. Điểm viền đỏ = mô hình không hội tụ ở cỡ mẫu đó.</p>
+      <div class="chart-wrap">
+        <canvas id="r2Chart"></canvas>
+        <div id="r2Tooltip" class="chart-tooltip hidden"></div>
+      </div>
+      <div id="r2Legend" class="chart-legend"></div>
+    </div>
+
+    <div class="panel-card">
+      <h2 data-i18n="sens_path_chart_title">Hệ số đường dẫn (Path Coefficients) theo cỡ mẫu</h2>
+      <p class="hint" data-i18n="sens_chart_hint">Di chuột vào biểu đồ để xem giá trị chính xác tại từng cỡ mẫu. Điểm viền đỏ = mô hình không hội tụ ở cỡ mẫu đó.</p>
+      <div class="chart-wrap">
+        <canvas id="pathChart"></canvas>
+        <div id="pathTooltip" class="chart-tooltip hidden"></div>
+      </div>
+      <div id="pathLegend" class="chart-legend"></div>
+    </div>
+
+    <div class="panel-card hidden" id="sensPvalueSection">
+      <h2 data-i18n="sens_pvalue_chart_title">P-value theo cỡ mẫu</h2>
+      <p class="hint" data-i18n="sens_pvalue_chart_hint">Đường nét đứt đỏ = ngưỡng 0.05. Với PLS-SEM, p-value ở đây đến từ một lượt Bootstrap chạy riêng ở mỗi cỡ mẫu (không phải bootstrap của lần phân tích chính) nên có thể dao động nhẹ giữa các lần chạy khác nhau.</p>
+      <div class="chart-wrap">
+        <canvas id="pvalueChart"></canvas>
+        <div id="pvalueTooltip" class="chart-tooltip hidden"></div>
+      </div>
+      <div id="pvalueLegend" class="chart-legend"></div>
+    </div>
+
+    <div class="panel-card">
+      <h2 data-i18n="sens_table_title">Bảng số liệu chi tiết</h2>
+      <div class="table-scroll"><table id="sensTable"></table></div>
+    </div>
+
+    <div class="panel-card">
+      <h2 data-i18n="sens_guide_section_title">Hướng dẫn đọc &amp; Ý nghĩa các chỉ số</h2>
+      <div class="reading-guide">
+        <details>
+          <summary data-i18n="sens_guide_what_summary">Sample Size Sensitivity là gì?</summary>
+          <div class="reading-guide-body" data-i18n-html="sens_guide_what_body">
+            <p>Kiểm tra độ ổn định của các ước lượng (R², path coefficient) khi cỡ mẫu <strong>thật</strong> giảm dần — bằng cách lấy ngẫu nhiên bớt quan sát từ chính dữ liệu bạn đã upload rồi chạy lại mô hình nhiều lần. Trả lời câu hỏi: <strong>"Nếu tôi có ít dữ liệu hơn, kết quả có còn ổn định/hội tụ không?"</strong></p>
+            <p>Công cụ này hữu ích để đánh giá độ nhạy của kết quả hiện tại với cỡ mẫu — <strong>không phải</strong> để tính xác suất phát hiện hiệu ứng hay xác định cỡ mẫu cần thu thập trước khi khảo sát (đó là việc của <em>Power Analysis</em>, một công cụ mô phỏng dữ liệu hoàn toàn mới từ mô hình quần thể giả định, khác về bản chất với việc bớt dần dữ liệu thật ở đây).</p>
+          </div>
+        </details>
+        <details>
+          <summary data-i18n="sens_guide_read_summary">Cách đọc biểu đồ &amp; bảng số liệu</summary>
+          <div class="reading-guide-body" data-i18n-html="sens_guide_read_body">
+            <ul>
+              <li><strong>Trục hoành (n):</strong> cỡ mẫu tại mỗi bước, giảm dần từ tổng số quan sát ban đầu.</li>
+              <li><strong>Biểu đồ R²:</strong> R² của từng biến nội sinh thay đổi thế nào khi cỡ mẫu giảm.</li>
+              <li><strong>Biểu đồ Path Coefficients:</strong> từng hệ số đường dẫn thay đổi ra sao khi cỡ mẫu giảm.</li>
+              <li><strong>Điểm viền đỏ:</strong> mô hình không hội tụ ở cỡ mẫu đó — dấu hiệu cỡ mẫu đã quá nhỏ để ước lượng ổn định.</li>
+              <li><strong>Bảng chi tiết:</strong> liệt kê từng cỡ mẫu đã chạy, có hội tụ hay không, cùng R² và path coefficient tương ứng tại điểm đó.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary data-i18n="sens_guide_limits_summary">Giới hạn</summary>
+          <div class="reading-guide-body" data-i18n-html="sens_guide_limits_body">
+            <ul>
+              <li>Mỗi cỡ mẫu chỉ được lấy mẫu con <strong>một lần</strong> (không lặp lại nhiều lần như mô phỏng Monte Carlo), nên một phần dao động giữa các điểm liền kề đến từ nhiễu ngẫu nhiên của riêng lần lấy mẫu đó, không hẳn phản ánh một xu hướng thật đang diễn ra. Muốn khắc phục đúng điểm này, dùng chế độ "Lấy mẫu lặp ở cỡ mẫu cố định" bên dưới.</li>
+              <li>Đây là phân tích trên dữ liệu đã có sẵn — không cho biết cỡ mẫu bạn <strong>nên</strong> thu thập nếu chưa khảo sát; muốn trả lời câu hỏi đó, dùng Power Analysis ở trang kết quả.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary data-i18n="sens_guide_resample_summary">Chế độ "Lấy mẫu lặp ở cỡ mẫu cố định" là gì?</summary>
+          <div class="reading-guide-body" data-i18n-html="sens_guide_resample_body">
+            <p>Thay vì giảm dần cỡ mẫu và chỉ lấy mẫu con <strong>một lần</strong> ở mỗi bước, chế độ này giữ <strong>cố định</strong> một cỡ mẫu nhỏ hơn do bạn chọn, rồi lấy ngẫu nhiên (không lặp lại) và chạy lại mô hình <strong>nhiều lần</strong> (N lần) ở đúng cỡ mẫu đó — một kiểu mô phỏng Monte Carlo thật sự trên chính dữ liệu của bạn.</p>
+            <p>Kết quả là một biểu đồ hộp (box plot) cho R² và từng hệ số đường dẫn, cho thấy các ước lượng đó dao động (median, khoảng IQR, min-max, và các điểm ngoại lai) ra sao qua N lần lấy mẫu — trả lời câu hỏi <strong>"Nếu tôi chỉ có {cỡ mẫu mới} quan sát, ước lượng của tôi ổn định đến mức nào?"</strong> chính xác hơn một điểm đơn lẻ.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+</main>
+
+{% include "footer.html" %}
+
+<div id="modalRoot"></div>
+
+<script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
+<script src="{{ url_for('static', filename='js/countdown.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ai_report_modal.js') }}"></script>
+<script src="{{ url_for('static', filename='js/sensitivity.js') }}"></script>
+</body>
+</html>

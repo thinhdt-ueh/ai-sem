@@ -1,0 +1,747 @@
+"""Centralized VI/EN translation catalog for backend-generated text: model
+validation errors, estimation errors, and Excel/Word report labels.
+
+Frontend UI strings live in static/js/i18n.js — a separate catalog, because
+it translates a different surface (DOM text) at a different time (in the
+browser, on language switch) than this one (error messages and report
+generation, at request time). Keys are named similarly where they describe
+the same concept, but the two are not required to stay in lockstep.
+
+Many statistics terms (AVE, VIF, HTMT, CFI, RMSEA, R², Cronbach's Alpha...)
+are conventionally left untranslated in Vietnamese academic writing too, so
+they appear the same in both catalogs — that isn't a missing translation.
+"""
+
+from __future__ import annotations
+
+DEFAULT_LANG = "en"
+SUPPORTED_LANGS = ("vi", "en")
+
+
+def get_lang(payload: dict | None) -> str:
+    lang = (payload or {}).get("lang", DEFAULT_LANG)
+    return lang if lang in SUPPORTED_LANGS else DEFAULT_LANG
+
+
+def t(key: str, lang: str = DEFAULT_LANG, **kwargs) -> str:
+    lang = lang if lang in SUPPORTED_LANGS else DEFAULT_LANG
+    template = _CATALOG.get(lang, {}).get(key) or _CATALOG[DEFAULT_LANG].get(key) or key
+    return template.format(**kwargs) if kwargs else template
+
+
+_CATALOG: dict[str, dict[str, str]] = {
+    "vi": {
+        # --- pls/model.py validation errors ---
+        "err_model_min_constructs": "Mô hình cần tối thiểu 2 biến tiềm ẩn (constructs).",
+        "err_construct_missing_id_name": "Mỗi construct cần có id và tên hợp lệ.",
+        "err_construct_invalid_mode": "Construct '{name}': mode phải là 'A' (reflective) hoặc 'B' (formative).",
+        "err_construct_min_indicators": "Construct '{name}' cần ít nhất 1 biến quan sát (indicator).",
+        "err_construct_duplicate_id": "Trùng id construct: '{cid}'.",
+        "err_indicator_duplicate": (
+            "Biến quan sát '{ind}' được gán cho nhiều hơn 1 construct ('{a}' và '{b}')."
+        ),
+        "err_path_unknown_construct": "Đường dẫn cấu trúc (path) tham chiếu đến construct không tồn tại.",
+        "err_path_self_loop": "Không thể tạo path từ một construct đến chính nó.",
+        "err_model_min_paths": "Mô hình cấu trúc cần ít nhất 1 đường dẫn (path) giữa các construct.",
+        "err_model_cycle": "Mô hình cấu trúc chứa vòng lặp (cycle) — cần mô hình đệ quy (không vòng lặp).",
+        "err_interaction_invalid_sources": (
+            "Biến tương tác '{name}' cần 2 hoặc 3 construct nguồn hợp lệ, khác nhau, và không phải "
+            "là biến tương tác khác."
+        ),
+        "err_interaction_of_interaction": "Biến tương tác '{name}' không thể lấy một biến tương tác khác làm nguồn.",
+        "err_interaction_three_way_requires_two_stage": (
+            "Biến tương tác 3 chiều '{name}' chỉ hỗ trợ phương pháp tính Two Stage."
+        ),
+        "err_interaction_has_predecessor": "Biến tương tác '{name}' không thể có đường dẫn đi vào (luôn là biến ngoại sinh).",
+        "err_interaction_no_target": "Biến tương tác '{name}' cần ít nhất 1 đường dẫn đến biến bị điều tiết.",
+        "err_interaction_missing_main_effect": (
+            "Biến tương tác '{name}' dự báo '{target}', nên '{src}' cũng cần có đường dẫn hiệu ứng "
+            "chính (main effect) trực tiếp đến '{target}'."
+        ),
+        "err_interaction_invalid_calc_method": (
+            "Biến tương tác '{name}': phương pháp tính (calculation method) không hợp lệ."
+        ),
+        "err_interaction_invalid_product_term": (
+            "Biến tương tác '{name}': kiểu sinh product term (product term generation) không hợp lệ."
+        ),
+        "err_dummy_bad_column": "Không tìm thấy cột '{name}' trong dữ liệu.",
+        "err_dummy_level_count": "Cột '{name}' phải có từ {min} đến {max} giá trị khác nhau để tạo biến giả.",
+        "err_dummy_bad_reference": "Nhóm tham chiếu (reference) không hợp lệ.",
+        "err_dummy_column_exists": "Cột đã tồn tại trong dữ liệu: {names}.",
+        "lbl_bf_skip_few_obs": "Không đủ quan sát so với omission distance.",
+        "lbl_bf_skip_no_pred": "Construct nội sinh nhưng không có predecessor (không nên xảy ra).",
+        "lbl_bf_skip_formative": "Formative (Mode B) — Q² qua blindfolding chỉ áp dụng cho construct reflective.",
+        "lbl_blindfolding_skipped_moderation": (
+            "Bỏ qua Q² (blindfolding): mô hình có biến điều tiết (moderation) nên không tương thích "
+            "với phương pháp lược bỏ dữ liệu theo hàng dùng để tính Q²."
+        ),
+
+        # --- pls/algorithm.py & cbsem/estimator.py estimation errors ---
+        "err_zero_variance_indicators": "Biến quan sát không có phương sai (giá trị không đổi): {cols}",
+        "err_missing_indicator_columns": "Không tìm thấy cột dữ liệu cho biến quan sát: {cols}",
+        "err_insufficient_observations": (
+            "Không đủ quan sát hợp lệ để ước lượng mô hình (còn {n} dòng sau khi loại "
+            "{missing} dòng thiếu dữ liệu)."
+        ),
+        "err_cbsem_insufficient_observations": (
+            "Không đủ quan sát hợp lệ để ước lượng mô hình (còn {n} dòng)."
+        ),
+        "err_mga_only_two_stage": (
+            "PLS-MGA chỉ hỗ trợ biến tương tác/điều tiết dùng phương pháp Two-Stage -- "
+            "không hỗ trợ Product Indicator hoặc Orthogonalization."
+        ),
+        "err_mga_group_too_small": "Mỗi nhóm cần tối thiểu {min} quan sát hợp lệ để so sánh đa nhóm.",
+        "err_mga_missing_column": "Vui lòng chọn một biến để phân nhóm.",
+        "err_mga_missing_groups": "Vui lòng chọn ít nhất một giá trị cho mỗi nhóm.",
+        "err_mga_overlapping_groups": "Hai nhóm không được có giá trị trùng nhau.",
+        "err_cbsem_formative_not_supported": (
+            "CB-SEM (Maximum Likelihood) chỉ hỗ trợ đo lường reflective. Construct formative "
+            "(Mode B) cần mô hình MIMIC với ràng buộc nhận dạng riêng, chưa được hỗ trợ: {names}"
+        ),
+        "err_cbsem_fit_failed": "semopy không ước lượng được mô hình: {exc}",
+        "err_cbsem_not_identified": (
+            "Mô hình không nhận dạng được (degrees of freedom = {dof} < 0): cần thêm biến "
+            "quan sát hoặc ràng buộc để có đủ thông tin ước lượng."
+        ),
+
+        # --- routes/api.py & routes/cbsem_api.py request errors ---
+        "err_upload_no_file": "Không tìm thấy file trong request.",
+        "err_upload_empty_filename": "Tên file trống.",
+        "err_upload_unsupported_format": "Định dạng file không được hỗ trợ: {ext}. Chỉ hỗ trợ CSV/XLSX.",
+        "err_upload_read_error": "Không đọc được file dữ liệu: {exc}",
+        "err_upload_empty_file": "File dữ liệu rỗng hoặc không có cột nào.",
+        "err_upload_too_many_rows": "File có {n} dòng, vượt quá giới hạn {max} dòng cho phép.",
+        "err_analyze_missing_file_id": "Thiếu file_id — hãy upload dữ liệu trước.",
+        "err_analyze_file_not_found": "Không tìm thấy dữ liệu đã upload (có thể đã hết hạn), hãy upload lại.",
+        "err_sensitivity_invalid_step": "Số quan sát giảm mỗi bước (N) phải là số nguyên dương.",
+        "err_sensitivity_not_enough_rows": "Dữ liệu chỉ có {n} quan sát, không đủ để giảm dần (cần tối thiểu {min}).",
+        "err_sensitivity_bootstrap_budget_exceeded": "Cấu hình bootstrap theo từng bước quá lớn ({total} lượt fit, tối đa {max}) — hãy tăng bước nhảy (N) hoặc giảm số lần bootstrap.",
+        "err_sensitivity_invalid_new_n": "Cỡ mẫu mới phải là số nguyên dương, tối thiểu {min} và nhỏ hơn số quan sát hiện tại ({n}).",
+        "err_sensitivity_invalid_row": "Không thể tái tạo dòng dữ liệu này (row_index không hợp lệ cho lượt phân tích độ nhạy đó).",
+        "err_plspredict_no_interactions": "PLSpredict chưa hỗ trợ mô hình có biến điều tiết (interaction/moderation).",
+        "err_plspredict_insufficient_data": "Dữ liệu chỉ có {n} quan sát, không đủ để chia k-fold cross-validation.",
+        "err_plspredict_no_targets": "Mô hình không có construct nội sinh reflective nào để dự báo.",
+        "err_ipma_invalid_target": "Vui lòng chọn một construct mục tiêu (target) hợp lệ cho IPMA.",
+        "err_ipma_target_exogenous": "Construct mục tiêu phải là biến nội sinh (có ít nhất 1 đường dẫn đi vào).",
+        "err_ipma_no_antecedents": "Không có construct tiền đề (antecedent) nào để vẽ IPMA cho mục tiêu đã chọn.",
+        "err_power_no_interactions": "Power Analysis chưa hỗ trợ mô hình có biến điều tiết (interaction/moderation).",
+        "err_power_reflective_only": "Power Analysis chỉ hỗ trợ construct reflective (Mode A) — construct \"{name}\" không phải reflective.",
+        "err_power_missing_loading": "Thiếu hệ số tải (loading) kỳ vọng cho construct \"{name}\".",
+        "err_power_missing_path_value": "Thiếu path coefficient kỳ vọng cho đường dẫn {src} → {tgt}.",
+        "err_power_budget_exceeded": "Cấu hình mô phỏng quá lớn ({total} lượt fit, tối đa {max}) — hãy giảm số cỡ mẫu, số lần lặp Monte Carlo, hoặc số bootstrap.",
+        "err_power_invalid_range": "Khoảng cỡ mẫu không hợp lệ — cần \"từ\" < \"đến\" và bước nhảy dương.",
+        "err_power_too_many_points": "Khoảng cỡ mẫu tạo ra quá nhiều điểm (tối đa {max}) — hãy tăng bước nhảy.",
+        "err_ml_no_algorithms": "Vui lòng chọn ít nhất một thuật toán Machine Learning để chạy.",
+        "err_ml_unknown_algorithm": "Thuật toán không hợp lệ: {ids}.",
+        "err_ml_algorithm_unavailable": "Thuật toán chưa khả dụng trên máy chủ này: {ids}.",
+        "err_ml_no_targets": "Mô hình không có construct nội sinh nào (có ít nhất 1 đường dẫn đi vào) để dự báo.",
+        "err_ml_insufficient_data": "Dữ liệu chỉ có {n} quan sát, không đủ để chia k-fold cross-validation.",
+        "err_ml_budget_exceeded": "Cấu hình chạy quá lâu (ước tính {estimate} giây, tối đa {max}) — hãy chọn ít thuật toán hơn hoặc giảm số fold (k).",
+        "err_ml_run_error": "Lỗi khi chạy so sánh Machine Learning: {exc}",
+        "err_pls_run_error": "Lỗi khi chạy PLS Algorithm: {exc}",
+        "err_bootstrap_run_error": "Lỗi khi chạy Bootstrapping: {exc}",
+        "err_cbsem_run_error": "Lỗi khi ước lượng CB-SEM: {exc}",
+        "err_export_missing_data": "Thiếu dữ liệu kết quả phân tích để xuất báo cáo.",
+        "err_export_excel_error": "Lỗi khi tạo file Excel: {exc}",
+        "err_export_word_error": "Lỗi khi tạo file Word: {exc}",
+
+        # --- AI report (routes/ai_report_api.py) ---
+        "err_ai_bad_provider": "Nhà cung cấp AI không hợp lệ.",
+        "err_ai_missing_key": "Vui lòng nhập API key.",
+        "err_ai_missing_context": "Thiếu dữ liệu kết quả phân tích để viết báo cáo.",
+        "err_ai_missing_prompt": "Vui lòng nhập yêu cầu (prompt) cho báo cáo.",
+        "err_ai_invalid_key": "API key không hợp lệ hoặc đã hết hạn.",
+        "err_ai_rate_limited": "Tài khoản đã vượt giới hạn tốc độ (rate limit) hoặc hết hạn mức sử dụng — vui lòng thử lại sau.",
+        "err_ai_bad_model": "Tên model không hợp lệ hoặc tài khoản không có quyền dùng model này: {detail}",
+        "err_ai_request_failed": "Lỗi khi gọi AI: {detail}",
+
+        # --- AI synthetic data generation (routes/ai_data_gen_api.py) ---
+        "err_ai_gen_missing_codebook": "Vui lòng định nghĩa ít nhất một biến quan sát (cột) với tên hợp lệ.",
+        "err_ai_gen_duplicate_column": "Tên cột bị trùng: {name}",
+        "err_ai_gen_invalid_n_rows": "Số quan sát phải trong khoảng {min}-{max}.",
+        "err_ai_gen_invalid_likert": "Thang đo Likert chỉ hỗ trợ 5 hoặc 7 mức.",
+        "err_ai_gen_bad_batch": "AI trả về dữ liệu không hợp lệ sau nhiều lần thử: {detail}",
+        "err_ai_gen_finalize_shape_mismatch": "Dữ liệu sinh ra không khớp với danh sách cột đã định nghĩa.",
+        "err_ai_gen_export_not_found": "Không tìm thấy thông tin sinh dữ liệu AI cho file này (có thể đây không phải dữ liệu do AI sinh ra).",
+        "err_ai_gen_invalid_demo_attr": "Thuộc tính demographic '{name}' không hợp lệ: {detail}",
+        "err_ai_gen_too_many_demo_attrs": "Tối đa {max} thuộc tính demographic bổ sung.",
+        "err_ai_gen_missing_topic": "Vui lòng nhập chủ đề / bối cảnh nghiên cứu.",
+        "err_ai_gen_bad_construct_search": "AI trả về dữ liệu không hợp lệ: {detail}",
+        "err_ai_gen_missing_constructs": "Cần ít nhất {min} construct để đề xuất mô hình.",
+        "err_ai_gen_bad_paths": "AI đề xuất mô hình không hợp lệ: {detail}",
+
+        # --- AI Lab Experiment: Worker Pool + Survey Experiment (routes/ai_worker_api.py) ---
+        "err_worker_pool_not_found": "Không tìm thấy Worker Pool này (có thể đã hết hạn hoặc pool_id sai).",
+        "err_worker_pool_import_bad_file": "File không đúng định dạng Worker Pool — cần có các cột worker_id, persona_description, resp_age, resp_gender.",
+        "err_worker_select_invalid_groups": "Cấu hình nhóm điều kiện không hợp lệ — mỗi nhóm cần cỡ mẫu (số nguyên dương) hợp lệ.",
+        "err_worker_select_too_many_groups": "Tối đa {max} nhóm điều kiện.",
+        "err_worker_select_m_too_large": "Tổng số worker cần chọn ({m}) vượt quá số worker có trong pool ({n}).",
+        "err_qual_score_missing_rubric": "Vui lòng nhập tiêu chí chấm điểm (rubric) cho AI.",
+        "err_qual_score_no_metadata": "Không tìm thấy dữ liệu do AI Lab/AI Lab Experiment sinh ra cho file này — tính năng chấm điểm chỉ áp dụng cho dữ liệu tự sinh bằng AI.",
+        "err_qual_score_bad_column": "Cột đã chọn không phải là một câu hỏi mở (qualitative) hợp lệ của dữ liệu này.",
+        "err_qual_score_bad_new_column": "Tên cột mới không hợp lệ — chỉ dùng chữ, số và dấu gạch dưới.",
+        "err_qual_score_column_exists": "Cột \"{name}\" đã tồn tại trong dữ liệu — hãy chọn tên khác.",
+
+        # --- shared report labels (pls/report.py & cbsem/report.py) ---
+        "rpt_title_pls": "PLS-SEM — Báo cáo phân tích",
+        "rpt_title_cbsem": "Báo cáo phân tích CB-SEM (Maximum Likelihood)",
+        "rpt_sheet_overview": "Tổng quan",
+        "rpt_sheet_diagram": "Sơ đồ mô hình",
+        "rpt_sheet_measurement": "Mô hình đo lường",
+        "rpt_sheet_outer_loadings": "Outer Loadings",
+        "rpt_sheet_cross_loadings": "Cross Loadings",
+        "rpt_sheet_reliability": "Độ tin cậy & Hội tụ",
+        "rpt_sheet_discriminant": "Giá trị phân biệt",
+        "rpt_sheet_structural": "Mô hình cấu trúc",
+        "rpt_model_info": "Thông tin mô hình",
+        "rpt_value": "Giá trị",
+        "rpt_method": "Phương pháp ước lượng",
+        "rpt_n_obs": "Số quan sát hợp lệ (n)",
+        "rpt_converged": "Hội tụ",
+        "rpt_yes": "Có",
+        "rpt_no": "Không",
+        "rpt_n_iterations": "Số vòng lặp",
+        "rpt_optimizer_message": "Thông báo optimizer",
+        "rpt_bootstrap_requested": "Bootstrapping — số mẫu yêu cầu",
+        "rpt_bootstrap_valid": "Bootstrapping — số mẫu hợp lệ",
+        "rpt_export_date": "Ngày xuất báo cáo",
+        "rpt_construct_list": "Danh sách Construct",
+        "rpt_construct": "Construct",
+        "rpt_measurement_type": "Loại đo lường",
+        "rpt_reflective": "Reflective (Mode A)",
+        "rpt_formative": "Formative (Mode B)",
+        "rpt_indicators": "Biến quan sát",
+        "rpt_endogenous": "Nội sinh",
+        "rpt_indicator": "Indicator",
+        "rpt_outer_loading": "Outer Loading",
+        "rpt_outer_weight": "Outer Weight",
+        "rpt_stdev": "STDEV",
+        "rpt_t_stat": "T Statistics",
+        "rpt_p_value": "P Values",
+        "rpt_significance": "Ý nghĩa (95%)",
+        "rpt_significant": "p < 0.05",
+        "rpt_not_significant": "Không ý nghĩa",
+        "rpt_cronbachs_alpha": "Cronbach's Alpha",
+        "rpt_rho_a": "rho_A",
+        "rpt_composite_reliability": "Composite Reliability",
+        "rpt_ave": "AVE",
+        "rpt_note": "Ghi chú",
+        "rpt_formative_no_reliability": "Formative (Mode B) — không áp dụng chỉ số độ tin cậy nội bộ",
+        "rpt_interaction_term": "Biến tương tác (Moderation)",
+        "rpt_moderation_no_reliability": "Biến tương tác — không áp dụng chỉ số độ tin cậy nội bộ",
+        "rpt_moderation_of": "Biến tương tác của",
+        "rpt_calc_method_product_indicator": "Product Indicator",
+        "rpt_calc_method_two_stage": "Two Stage",
+        "rpt_calc_method_orthogonalization": "Orthogonalization",
+        "rpt_fornell_larcker": "Fornell-Larcker Criterion",
+        "rpt_htmt": "HTMT",
+        "rpt_path_coefficients": "Path Coefficients",
+        "rpt_path": "Đường dẫn",
+        "rpt_path_coefficient": "Path Coefficient (β)",
+        "rpt_total_effects_title": "Total & Indirect Effects (Kiểm định Mediation)",
+        "rpt_direct_effect": "Hiệu ứng trực tiếp",
+        "rpt_indirect_effect": "Hiệu ứng gián tiếp",
+        "rpt_total_effect": "Hiệu ứng tổng",
+        "rpt_total_effects_note": (
+            "Hiệu ứng gián tiếp = tổng tích các path coefficient dọc theo mọi đường đi gián tiếp "
+            "(qua các biến trung gian/mediator) từ nguồn đến đích; hiệu ứng tổng = trực tiếp + gián tiếp. "
+            "Chỉ những cặp construct có ít nhất một đường đi (trực tiếp hoặc gián tiếp) mới xuất hiện ở đây."
+        ),
+        "rpt_specific_indirect_title": "Hiệu ứng gián tiếp cụ thể (Specific Indirect Effects)",
+        "rpt_specific_indirect_note": (
+            "Mỗi dòng là MỘT đường đi trung gian cụ thể (tích các path coefficient dọc theo đường đó), "
+            "khác với bảng Total & Indirect Effects vốn cộng gộp tất cả đường đi giữa một cặp construct. "
+            "Nếu đã bootstrap, ý nghĩa thống kê được kiểm định trực tiếp trên tích của đúng lần lấy mẫu lại đó."
+        ),
+        "rpt_moderator": "Biến điều tiết",
+        "rpt_mm_index": "Index",
+        "rpt_moderated_mediation_title": "Index of Moderated Mediation (Hayes, 2015)",
+        "rpt_moderated_mediation_note": (
+            "Chỉ xuất hiện với các đường trung gian có đúng một đoạn (edge) bị điều tiết. Chỉ số là độ dốc "
+            "của hiệu ứng gián tiếp theo biến điều tiết — hiệu ứng gián tiếp thay đổi bao nhiêu khi biến điều "
+            "tiết tăng 1 đơn vị. Nếu đã bootstrap, ý nghĩa thống kê được kiểm định trực tiếp trên chỉ số này."
+        ),
+        # --- ML comparison report labels (ml_compare/report.py) ---
+        "rpt_title_ml": "So sánh Machine Learning — Báo cáo",
+        "rpt_sheet_ml_comparison": "So sánh",
+        "rpt_ml_k": "Số fold (k)",
+        "rpt_ml_algorithms_selected": "Thuật toán đã chọn",
+        "rpt_ml_targets_title": "Các biến mục tiêu (construct nội sinh)",
+        "rpt_ml_target": "Biến mục tiêu",
+        "rpt_ml_predictor": "Biến tiền đề",
+        "rpt_ml_sem_coef": "SEM (path coef.)",
+        "rpt_ml_rmse": "RMSE",
+        "rpt_ml_accuracy": "Accuracy",
+        "rpt_ml_auc": "AUC",
+        "rpt_ml_native_importance": "Importance gốc",
+        "rpt_ml_permutation_importance": "Permutation Importance",
+        "rpt_ml_comparison_title": "So sánh: Hệ số đường dẫn SEM vs. Feature Importance (ML)",
+        "rpt_ml_importance_title": "Bảng xếp hạng Importance",
+        "rpt_ml_logreg_note": (
+            "Biến mục tiêu đã được chuyển thành 0/1 theo trung vị (median) của từng fold huấn luyện "
+            "(y = 1 nếu lớn hơn trung vị, ngược lại y = 0) — xem giải thích đầy đủ trên trang So sánh Machine Learning."
+        ),
+        "ml_algo_linreg": "Hồi quy tuyến tính (Linear Regression)",
+        "ml_algo_logreg": "Hồi quy Logistic (Logistic Regression)",
+        "ml_algo_dtree": "Cây quyết định (Decision Tree)",
+        "ml_algo_rf": "Random Forest",
+        "ml_algo_svm": "Support Vector Machine (SVM)",
+        "ml_algo_gbm": "Gradient Boosting (GBM)",
+        "ml_algo_xgboost": "XGBoost",
+        "ml_algo_lightgbm": "LightGBM",
+        "ml_algo_catboost": "CatBoost",
+
+        "rpt_f_squared": "f²",
+        "rpt_f2_effect": "Mức ảnh hưởng f²",
+        "rpt_r2_q2_title": "R² & Q² (Predictive Relevance)",
+        "rpt_endogenous_construct": "Construct nội sinh",
+        "rpt_r2": "R²",
+        "rpt_r2_adj": "R² hiệu chỉnh",
+        "rpt_r2_assessment": "Đánh giá R²",
+        "rpt_q2": "Q² (blindfolding, D={d})",
+        "rpt_q2_assessment": "Đánh giá Q²",
+        "rpt_vif_title": "Đa cộng tuyến (VIF)",
+        "rpt_pair": "Cặp",
+        "rpt_vif": "VIF",
+        "rpt_cmb_title": "Common Method Bias — Full Collinearity Test (Kock, 2015)",
+        "rpt_cmb_note": (
+            "Mỗi construct được hồi quy trên TẤT CẢ construct còn lại (không chỉ các predictor "
+            "trực tiếp) để kiểm tra đa cộng tuyến toàn phần — kỹ thuật WarpPLS dùng để phát hiện "
+            "common method bias. Nếu mọi VIF ≤ {threshold}, mô hình được xem là không có dấu hiệu CMB."
+        ),
+        "rpt_cmb_assessment": "Đánh giá CMB",
+        "lbl_cmb_ok": "Không có dấu hiệu CMB",
+        "lbl_cmb_warn": "Có khả năng bị CMB",
+        "rpt_structural_suffix": " (cấu trúc)",
+        "rpt_formative_measurement_suffix": " (đo lường formative)",
+        "lbl_r2_weak": "Yếu",
+        "lbl_r2_moderate": "Trung bình",
+        "lbl_r2_substantial": "Khá mạnh",
+        "lbl_r2_strong": "Mạnh",
+        "lbl_f2_none": "Không đáng kể",
+        "lbl_f2_small": "Nhỏ",
+        "lbl_f2_medium": "Trung bình",
+        "lbl_f2_large": "Lớn",
+        "lbl_q2_none": "Không có ý nghĩa dự báo",
+
+        # --- CB-SEM-only report labels ---
+        "rpt_fit_index": "Chỉ số phù hợp mô hình (Fit Index)",
+        "rpt_fit_assessment": "Đánh giá",
+        "rpt_model_fit": "Model Fit",
+        "rpt_fit_chi_square": "Chi-square (χ²)",
+        "rpt_fit_df": "Degrees of Freedom (df)",
+        "rpt_fit_chi2_p": "χ²/df p-value",
+        "rpt_fit_cfi": "CFI",
+        "rpt_fit_tli": "TLI",
+        "rpt_fit_rmsea": "RMSEA",
+        "rpt_fit_srmr": "SRMR",
+        "rpt_fit_gfi": "GFI",
+        "rpt_fit_agfi": "AGFI",
+        "rpt_fit_nfi": "NFI",
+        "rpt_fit_aic": "AIC",
+        "rpt_fit_bic": "BIC",
+        "lbl_fit_good": "Tốt",
+        "lbl_fit_acceptable": "Chấp nhận được",
+        "lbl_fit_poor": "Chưa đạt",
+        "rpt_factor_loadings": "Factor Loadings",
+        "rpt_unstandardized": "Unstandardized",
+        "rpt_standardized": "Standardized",
+        "rpt_unstd_short": "Unstd.",
+        "rpt_std_short": "Std.",
+        "rpt_se": "SE",
+        "rpt_z_value": "z-value",
+        "rpt_z_short": "z",
+        "rpt_p_short": "p",
+        "rpt_reference_indicator": "Biến tham chiếu (cố định = 1)",
+        "rpt_reference_short": "Ref.",
+        "rpt_r2_only_title": "R² (bao gồm hiệu chỉnh sai lệch đo lường)",
+        "rpt_r2_note": (
+            "Ghi chú: R² trong CB-SEM đã hiệu chỉnh sai lệch do sai số đo lường (measurement error), "
+            "nên thường cao hơn R² tương ứng ước lượng bằng PLS-SEM trên cùng dữ liệu."
+        ),
+
+        # --- report section headings & misc (Word) ---
+        "rpt_no_vif_pairs": "Không có construct nào có ≥2 tiền tố / biến formative để kiểm tra đa cộng tuyến.",
+        "rpt_bootstrap_note": (
+            "Ghi chú: Bootstrapping chạy với {requested} mẫu lặp lại ({valid} mẫu hợp lệ)."
+        ),
+        "rpt_blindfolding_note": "Blindfolding chạy với omission distance D = {d}.",
+        "rpt_section_overview": "1. Tổng quan mô hình",
+        "rpt_section_diagram": "Sơ đồ mô hình",
+        "rpt_section_measurement": "2. Mô hình đo lường (Measurement Model)",
+        "rpt_section_loadings": "2.1. Outer Loadings & Weights",
+        "rpt_section_reliability": "2.2. Độ tin cậy & Giá trị hội tụ",
+        "rpt_section_fl": "2.3. Giá trị phân biệt — Fornell-Larcker",
+        "rpt_section_htmt": "2.4. Giá trị phân biệt — HTMT",
+        "rpt_section_structural": "3. Mô hình cấu trúc (Structural Model)",
+        "rpt_section_path_coef": "3.1. Path Coefficients",
+        "rpt_section_r2q2": "3.2. R² & Q² (Predictive Relevance)",
+        "rpt_section_vif": "3.3. Đa cộng tuyến (VIF)",
+        "rpt_word_converged": "Đã hội tụ",
+        "rpt_word_not_converged": "CHƯA hội tụ",
+        "rpt_after_iterations": "sau {it} vòng lặp",
+
+        # --- CB-SEM Word section headings ---
+        "rpt_cbsem_section_overview": "1. Tổng quan mô hình",
+        "rpt_cbsem_section_fit": "2. Model Fit",
+        "rpt_cbsem_section_measurement": "3. Mô hình đo lường (Measurement Model)",
+        "rpt_cbsem_section_loadings": "3.1. Factor Loadings",
+        "rpt_cbsem_section_reliability": "3.2. Độ tin cậy & Giá trị hội tụ",
+        "rpt_cbsem_section_fl": "3.3. Giá trị phân biệt — Fornell-Larcker",
+        "rpt_cbsem_section_htmt": "3.4. Giá trị phân biệt — HTMT",
+        "rpt_cbsem_section_structural": "4. Mô hình cấu trúc (Structural Model)",
+        "rpt_cbsem_section_r2": "R²",
+    },
+    "en": {
+        "err_model_min_constructs": "The model needs at least 2 latent constructs.",
+        "err_construct_missing_id_name": "Every construct needs a valid id and name.",
+        "err_construct_invalid_mode": "Construct '{name}': mode must be 'A' (reflective) or 'B' (formative).",
+        "err_construct_min_indicators": "Construct '{name}' needs at least 1 indicator.",
+        "err_construct_duplicate_id": "Duplicate construct id: '{cid}'.",
+        "err_indicator_duplicate": (
+            "Indicator '{ind}' is assigned to more than one construct ('{a}' and '{b}')."
+        ),
+        "err_path_unknown_construct": "A structural path references a construct that does not exist.",
+        "err_path_self_loop": "A construct cannot have a path to itself.",
+        "err_model_min_paths": "The structural model needs at least 1 path between constructs.",
+        "err_model_cycle": "The structural model contains a cycle — a recursive (acyclic) model is required.",
+        "err_interaction_invalid_sources": (
+            "Interaction term '{name}' needs 2 or 3 valid, distinct source constructs, none "
+            "of which may itself be an interaction term."
+        ),
+        "err_interaction_of_interaction": "Interaction term '{name}' cannot use another interaction term as a source.",
+        "err_interaction_three_way_requires_two_stage": (
+            "Three-way interaction term '{name}' only supports the Two Stage calculation method."
+        ),
+        "err_interaction_has_predecessor": "Interaction term '{name}' cannot have an incoming path (it is always exogenous).",
+        "err_interaction_no_target": "Interaction term '{name}' needs at least 1 path to the moderated construct.",
+        "err_interaction_missing_main_effect": (
+            "Interaction term '{name}' predicts '{target}', so '{src}' also needs a direct main-effect "
+            "path to '{target}'."
+        ),
+        "err_interaction_invalid_calc_method": "Interaction term '{name}': invalid calculation method.",
+        "err_interaction_invalid_product_term": "Interaction term '{name}': invalid product term generation setting.",
+        "err_dummy_bad_column": "Column '{name}' not found in the data.",
+        "err_dummy_level_count": "Column '{name}' needs between {min} and {max} distinct values to create dummy variables.",
+        "err_dummy_bad_reference": "Invalid reference category.",
+        "err_dummy_column_exists": "Column already exists in the data: {names}.",
+        "lbl_bf_skip_few_obs": "Not enough observations relative to the omission distance.",
+        "lbl_bf_skip_no_pred": "Endogenous construct has no predecessor (should not happen).",
+        "lbl_bf_skip_formative": "Formative (Mode B) — blindfolding Q² only applies to reflective constructs.",
+        "lbl_blindfolding_skipped_moderation": (
+            "Q² (blindfolding) skipped: the model contains a moderation (interaction) term, which is "
+            "not compatible with the row-wise data-omission procedure Q² relies on."
+        ),
+
+        "err_zero_variance_indicators": "Indicator(s) with zero variance (constant value): {cols}",
+        "err_missing_indicator_columns": "Data column(s) not found for indicator(s): {cols}",
+        "err_insufficient_observations": (
+            "Not enough valid observations to estimate the model ({n} rows remain after "
+            "dropping {missing} row(s) with missing data)."
+        ),
+        "err_cbsem_insufficient_observations": (
+            "Not enough valid observations to estimate the model ({n} rows remain)."
+        ),
+        "err_mga_only_two_stage": (
+            "PLS-MGA only supports interaction/moderation constructs using the Two-Stage "
+            "method -- Product Indicator and Orthogonalization aren't supported."
+        ),
+        "err_mga_group_too_small": "Each group needs at least {min} valid observations to compare.",
+        "err_mga_missing_column": "Please choose a column to split respondents into groups.",
+        "err_mga_missing_groups": "Please choose at least one value for each group.",
+        "err_mga_overlapping_groups": "The two groups cannot share any value.",
+        "err_cbsem_formative_not_supported": (
+            "CB-SEM (Maximum Likelihood) only supports reflective measurement. Formative constructs "
+            "(Mode B) need a MIMIC specification with separate identification constraints, which is "
+            "not yet supported: {names}"
+        ),
+        "err_cbsem_fit_failed": "semopy failed to estimate the model: {exc}",
+        "err_cbsem_not_identified": (
+            "The model is not identified (degrees of freedom = {dof} < 0): add more indicators "
+            "or constraints to have enough information to estimate it."
+        ),
+
+        "err_upload_no_file": "No file found in the request.",
+        "err_upload_empty_filename": "Empty filename.",
+        "err_upload_unsupported_format": "Unsupported file format: {ext}. Only CSV/XLSX are supported.",
+        "err_upload_read_error": "Could not read the data file: {exc}",
+        "err_upload_empty_file": "The data file is empty or has no columns.",
+        "err_upload_too_many_rows": "The file has {n} rows, exceeding the {max}-row limit.",
+        "err_analyze_missing_file_id": "Missing file_id — upload data first.",
+        "err_analyze_file_not_found": "Uploaded data not found (it may have expired) — please upload again.",
+        "err_sensitivity_invalid_step": "The observations-per-step (N) must be a positive integer.",
+        "err_sensitivity_not_enough_rows": "The data only has {n} observations, not enough to shrink further (need at least {min}).",
+        "err_sensitivity_bootstrap_budget_exceeded": "This per-step bootstrap configuration is too large ({total} fits, max {max}) -- increase the step size (N) or reduce the bootstrap count.",
+        "err_sensitivity_invalid_new_n": "The new sample size must be a positive integer, at least {min} and smaller than the current {n} observations.",
+        "err_sensitivity_invalid_row": "Could not reproduce this row's data (invalid row_index for that sensitivity run).",
+        "err_plspredict_no_interactions": "PLSpredict doesn't yet support models with an interaction/moderation construct.",
+        "err_plspredict_insufficient_data": "The data only has {n} observations, not enough for k-fold cross-validation.",
+        "err_plspredict_no_targets": "The model has no reflective endogenous constructs to predict.",
+        "err_ipma_invalid_target": "Please choose a valid target construct for IPMA.",
+        "err_ipma_target_exogenous": "The target construct must be endogenous (have at least one incoming path).",
+        "err_ipma_no_antecedents": "No antecedent constructs to plot IPMA for the chosen target.",
+        "err_power_no_interactions": "Power Analysis doesn't yet support models with an interaction/moderation construct.",
+        "err_power_reflective_only": "Power Analysis only supports reflective (Mode A) constructs — \"{name}\" isn't reflective.",
+        "err_power_missing_loading": "Missing expected loading for construct \"{name}\".",
+        "err_power_missing_path_value": "Missing expected path coefficient for {src} → {tgt}.",
+        "err_power_budget_exceeded": "This simulation configuration is too large ({total} fits, max {max}) — reduce the number of sample sizes, Monte Carlo replicates, or bootstrap resamples.",
+        "err_power_invalid_range": "Invalid sample-size range — need \"from\" < \"to\" and a positive step.",
+        "err_power_too_many_points": "The sample-size range produces too many points (max {max}) — increase the step.",
+        "err_ml_no_algorithms": "Please select at least one ML algorithm to run.",
+        "err_ml_unknown_algorithm": "Invalid algorithm(s): {ids}.",
+        "err_ml_algorithm_unavailable": "Algorithm(s) not available on this server: {ids}.",
+        "err_ml_no_targets": "The model has no endogenous constructs (with at least one incoming path) to predict.",
+        "err_ml_insufficient_data": "The data only has {n} observations, not enough for k-fold cross-validation.",
+        "err_ml_budget_exceeded": "This configuration would take too long (estimated {estimate}s, max {max}s) — select fewer algorithms or reduce the number of folds (k).",
+        "err_ml_run_error": "Error while running the ML comparison: {exc}",
+        "err_pls_run_error": "Error while running the PLS Algorithm: {exc}",
+        "err_bootstrap_run_error": "Error while running Bootstrapping: {exc}",
+        "err_cbsem_run_error": "Error while estimating CB-SEM: {exc}",
+        "err_export_missing_data": "Missing analysis result data to export.",
+        "err_export_excel_error": "Error while generating the Excel file: {exc}",
+        "err_export_word_error": "Error while generating the Word file: {exc}",
+
+        # --- AI report (routes/ai_report_api.py) ---
+        "err_ai_bad_provider": "Invalid AI provider.",
+        "err_ai_missing_key": "Please enter an API key.",
+        "err_ai_missing_context": "Missing analysis result data to write a report from.",
+        "err_ai_missing_prompt": "Please enter a prompt for the report.",
+        "err_ai_invalid_key": "The API key is invalid or has expired.",
+        "err_ai_rate_limited": "The account has hit its rate limit or usage quota — please try again later.",
+        "err_ai_bad_model": "Invalid model name, or this account doesn't have access to it: {detail}",
+        "err_ai_request_failed": "Error calling the AI provider: {detail}",
+
+        # --- AI synthetic data generation (routes/ai_data_gen_api.py) ---
+        "err_ai_gen_missing_codebook": "Please define at least one indicator (column) with a valid name.",
+        "err_ai_gen_duplicate_column": "Duplicate column name: {name}",
+        "err_ai_gen_invalid_n_rows": "Number of observations must be between {min} and {max}.",
+        "err_ai_gen_invalid_likert": "The Likert scale only supports 5 or 7 points.",
+        "err_ai_gen_bad_batch": "The AI returned invalid data after multiple attempts: {detail}",
+        "err_ai_gen_finalize_shape_mismatch": "The generated data doesn't match the defined column list.",
+        "err_ai_gen_export_not_found": "No AI-generation metadata found for this file (it may not be AI-generated data).",
+        "err_ai_gen_invalid_demo_attr": "Demographic attribute '{name}' is invalid: {detail}",
+        "err_ai_gen_too_many_demo_attrs": "At most {max} additional demographic attributes are allowed.",
+        "err_ai_gen_missing_topic": "Please enter a research topic / context.",
+        "err_ai_gen_bad_construct_search": "The AI returned invalid data: {detail}",
+        "err_ai_gen_missing_constructs": "At least {min} constructs are needed to suggest a model.",
+        "err_ai_gen_bad_paths": "The AI's proposed model is invalid: {detail}",
+
+        # --- AI Lab Experiment: Worker Pool + Survey Experiment (routes/ai_worker_api.py) ---
+        "err_worker_pool_not_found": "This Worker Pool could not be found (it may have expired, or the pool_id is wrong).",
+        "err_worker_pool_import_bad_file": "This file isn't a valid Worker Pool export — it needs worker_id, persona_description, resp_age, and resp_gender columns.",
+        "err_worker_select_invalid_groups": "Invalid condition-group configuration — each group needs a valid positive integer group size.",
+        "err_worker_select_too_many_groups": "At most {max} condition groups are allowed.",
+        "err_worker_select_m_too_large": "The total number of workers requested ({m}) exceeds how many are in the pool ({n}).",
+        "err_qual_score_missing_rubric": "Please enter a scoring rubric for the AI.",
+        "err_qual_score_no_metadata": "No AI Lab/AI Lab Experiment-generated data was found for this file — the AI-scoring feature only works on AI-generated data.",
+        "err_qual_score_bad_column": "The selected column isn't a valid qualitative (open-ended) column in this dataset.",
+        "err_qual_score_bad_new_column": "Invalid new column name — use only letters, numbers, and underscores.",
+        "err_qual_score_column_exists": "A column named \"{name}\" already exists in the dataset — choose a different name.",
+
+        "rpt_title_pls": "PLS-SEM — Analysis Report",
+        "rpt_title_cbsem": "CB-SEM Analysis Report (Maximum Likelihood)",
+        "rpt_sheet_overview": "Overview",
+        "rpt_sheet_diagram": "Path Diagram",
+        "rpt_sheet_measurement": "Measurement Model",
+        "rpt_sheet_outer_loadings": "Outer Loadings",
+        "rpt_sheet_cross_loadings": "Cross Loadings",
+        "rpt_sheet_reliability": "Reliability & Validity",
+        "rpt_sheet_discriminant": "Discriminant Validity",
+        "rpt_sheet_structural": "Structural Model",
+        "rpt_model_info": "Model Information",
+        "rpt_value": "Value",
+        "rpt_method": "Estimation Method",
+        "rpt_n_obs": "Valid Observations (n)",
+        "rpt_converged": "Converged",
+        "rpt_yes": "Yes",
+        "rpt_no": "No",
+        "rpt_n_iterations": "Iterations",
+        "rpt_optimizer_message": "Optimizer Message",
+        "rpt_bootstrap_requested": "Bootstrapping — Samples Requested",
+        "rpt_bootstrap_valid": "Bootstrapping — Valid Samples",
+        "rpt_export_date": "Report Generated",
+        "rpt_construct_list": "Construct List",
+        "rpt_construct": "Construct",
+        "rpt_measurement_type": "Measurement Type",
+        "rpt_reflective": "Reflective (Mode A)",
+        "rpt_formative": "Formative (Mode B)",
+        "rpt_indicators": "Indicators",
+        "rpt_endogenous": "Endogenous",
+        "rpt_indicator": "Indicator",
+        "rpt_outer_loading": "Outer Loading",
+        "rpt_outer_weight": "Outer Weight",
+        "rpt_stdev": "STDEV",
+        "rpt_t_stat": "T Statistics",
+        "rpt_p_value": "P Values",
+        "rpt_significance": "Significance (95%)",
+        "rpt_significant": "p < 0.05",
+        "rpt_not_significant": "Not significant",
+        "rpt_cronbachs_alpha": "Cronbach's Alpha",
+        "rpt_rho_a": "rho_A",
+        "rpt_composite_reliability": "Composite Reliability",
+        "rpt_ave": "AVE",
+        "rpt_note": "Note",
+        "rpt_formative_no_reliability": "Formative (Mode B) — internal reliability metrics not applicable",
+        "rpt_interaction_term": "Interaction term (Moderation)",
+        "rpt_moderation_no_reliability": "Interaction term — internal reliability metrics not applicable",
+        "rpt_moderation_of": "Interaction of",
+        "rpt_calc_method_product_indicator": "Product Indicator",
+        "rpt_calc_method_two_stage": "Two Stage",
+        "rpt_calc_method_orthogonalization": "Orthogonalization",
+        "rpt_fornell_larcker": "Fornell-Larcker Criterion",
+        "rpt_htmt": "HTMT",
+        "rpt_path_coefficients": "Path Coefficients",
+        "rpt_path": "Path",
+        "rpt_path_coefficient": "Path Coefficient (β)",
+        "rpt_total_effects_title": "Total & Indirect Effects (Mediation Testing)",
+        "rpt_direct_effect": "Direct Effect",
+        "rpt_indirect_effect": "Indirect Effect",
+        "rpt_total_effect": "Total Effect",
+        "rpt_total_effects_note": (
+            "Indirect effect = sum of the products of path coefficients along every indirect route "
+            "(through mediator constructs) from source to target; total effect = direct + indirect. "
+            "Only construct pairs with at least one route (direct or indirect) appear here."
+        ),
+        "rpt_specific_indirect_title": "Specific Indirect Effects",
+        "rpt_specific_indirect_note": (
+            "Each row is ONE specific mediated route (the product of path coefficients along that route), "
+            "unlike the Total & Indirect Effects table, which sums every route between a construct pair. "
+            "When bootstrapping was run, significance is tested directly on that same per-resample product."
+        ),
+        "rpt_moderator": "Moderator",
+        "rpt_mm_index": "Index",
+        "rpt_moderated_mediation_title": "Index of Moderated Mediation (Hayes, 2015)",
+        "rpt_moderated_mediation_note": (
+            "Appears only for mediated routes with exactly one moderated edge. The index is the slope of "
+            "the indirect effect with respect to the moderator -- how much the indirect effect changes per "
+            "one-unit increase in the moderator. When bootstrapping was run, significance is tested directly on this index."
+        ),
+        # --- ML comparison report labels (ml_compare/report.py) ---
+        "rpt_title_ml": "Machine Learning Comparison — Report",
+        "rpt_sheet_ml_comparison": "Comparison",
+        "rpt_ml_k": "Number of folds (k)",
+        "rpt_ml_algorithms_selected": "Algorithms selected",
+        "rpt_ml_targets_title": "Target constructs (endogenous)",
+        "rpt_ml_target": "Target",
+        "rpt_ml_predictor": "Predictor",
+        "rpt_ml_sem_coef": "SEM (path coef.)",
+        "rpt_ml_rmse": "RMSE",
+        "rpt_ml_accuracy": "Accuracy",
+        "rpt_ml_auc": "AUC",
+        "rpt_ml_native_importance": "Native Importance",
+        "rpt_ml_permutation_importance": "Permutation Importance",
+        "rpt_ml_comparison_title": "Comparison: SEM Path Coefficients vs. ML Feature Importance",
+        "rpt_ml_importance_title": "Importance Ranking",
+        "rpt_ml_logreg_note": (
+            "The target was converted to 0/1 using each training fold's median (y = 1 if above the median, "
+            "otherwise y = 0) -- see the full explanation on the ML Comparison page."
+        ),
+        "ml_algo_linreg": "Linear Regression",
+        "ml_algo_logreg": "Logistic Regression",
+        "ml_algo_dtree": "Decision Tree",
+        "ml_algo_rf": "Random Forest",
+        "ml_algo_svm": "Support Vector Machine (SVM)",
+        "ml_algo_gbm": "Gradient Boosting (GBM)",
+        "ml_algo_xgboost": "XGBoost",
+        "ml_algo_lightgbm": "LightGBM",
+        "ml_algo_catboost": "CatBoost",
+
+        "rpt_f_squared": "f²",
+        "rpt_f2_effect": "f² Effect Size",
+        "rpt_r2_q2_title": "R² & Q² (Predictive Relevance)",
+        "rpt_endogenous_construct": "Endogenous Construct",
+        "rpt_r2": "R²",
+        "rpt_r2_adj": "Adjusted R²",
+        "rpt_r2_assessment": "R² Assessment",
+        "rpt_q2": "Q² (blindfolding, D={d})",
+        "rpt_q2_assessment": "Q² Assessment",
+        "rpt_vif_title": "Collinearity (VIF)",
+        "rpt_pair": "Pair",
+        "rpt_vif": "VIF",
+        "rpt_cmb_title": "Common Method Bias — Full Collinearity Test (Kock, 2015)",
+        "rpt_cmb_note": (
+            "Each construct is regressed on ALL other constructs (not just its direct predictors) "
+            "to test full collinearity — the technique WarpPLS uses to detect common method bias. "
+            "If every VIF is <= {threshold}, the model is considered free of CMB."
+        ),
+        "rpt_cmb_assessment": "CMB Assessment",
+        "lbl_cmb_ok": "No CMB concern",
+        "lbl_cmb_warn": "Possible CMB concern",
+        "rpt_structural_suffix": " (structural)",
+        "rpt_formative_measurement_suffix": " (formative measurement)",
+        "lbl_r2_weak": "Weak",
+        "lbl_r2_moderate": "Moderate",
+        "lbl_r2_substantial": "Substantial",
+        "lbl_r2_strong": "Strong",
+        "lbl_f2_none": "Negligible",
+        "lbl_f2_small": "Small",
+        "lbl_f2_medium": "Medium",
+        "lbl_f2_large": "Large",
+        "lbl_q2_none": "No predictive relevance",
+
+        "rpt_fit_index": "Fit Index",
+        "rpt_fit_assessment": "Assessment",
+        "rpt_model_fit": "Model Fit",
+        "rpt_fit_chi_square": "Chi-square (χ²)",
+        "rpt_fit_df": "Degrees of Freedom (df)",
+        "rpt_fit_chi2_p": "χ²/df p-value",
+        "rpt_fit_cfi": "CFI",
+        "rpt_fit_tli": "TLI",
+        "rpt_fit_rmsea": "RMSEA",
+        "rpt_fit_srmr": "SRMR",
+        "rpt_fit_gfi": "GFI",
+        "rpt_fit_agfi": "AGFI",
+        "rpt_fit_nfi": "NFI",
+        "rpt_fit_aic": "AIC",
+        "rpt_fit_bic": "BIC",
+        "lbl_fit_good": "Good",
+        "lbl_fit_acceptable": "Acceptable",
+        "lbl_fit_poor": "Poor",
+        "rpt_factor_loadings": "Factor Loadings",
+        "rpt_unstandardized": "Unstandardized",
+        "rpt_standardized": "Standardized",
+        "rpt_unstd_short": "Unstd.",
+        "rpt_std_short": "Std.",
+        "rpt_se": "SE",
+        "rpt_z_value": "z-value",
+        "rpt_z_short": "z",
+        "rpt_p_short": "p",
+        "rpt_reference_indicator": "Reference indicator (fixed = 1)",
+        "rpt_reference_short": "Ref.",
+        "rpt_r2_only_title": "R² (corrected for measurement error)",
+        "rpt_r2_note": (
+            "Note: R² in CB-SEM is corrected for measurement error, so it is typically higher than "
+            "the corresponding R² estimated by PLS-SEM on the same data."
+        ),
+
+        "rpt_no_vif_pairs": "No construct has ≥2 predecessors / formative indicators to check collinearity.",
+        "rpt_bootstrap_note": (
+            "Note: Bootstrapping ran with {requested} resamples ({valid} valid samples)."
+        ),
+        "rpt_blindfolding_note": "Blindfolding ran with omission distance D = {d}.",
+        "rpt_section_overview": "1. Model Overview",
+        "rpt_section_diagram": "Path Diagram",
+        "rpt_section_measurement": "2. Measurement Model",
+        "rpt_section_loadings": "2.1. Outer Loadings & Weights",
+        "rpt_section_reliability": "2.2. Reliability & Convergent Validity",
+        "rpt_section_fl": "2.3. Discriminant Validity — Fornell-Larcker",
+        "rpt_section_htmt": "2.4. Discriminant Validity — HTMT",
+        "rpt_section_structural": "3. Structural Model",
+        "rpt_section_path_coef": "3.1. Path Coefficients",
+        "rpt_section_r2q2": "3.2. R² & Q² (Predictive Relevance)",
+        "rpt_section_vif": "3.3. Collinearity (VIF)",
+        "rpt_word_converged": "Converged",
+        "rpt_word_not_converged": "NOT converged",
+        "rpt_after_iterations": "after {it} iterations",
+
+        "rpt_cbsem_section_overview": "1. Model Overview",
+        "rpt_cbsem_section_fit": "2. Model Fit",
+        "rpt_cbsem_section_measurement": "3. Measurement Model",
+        "rpt_cbsem_section_loadings": "3.1. Factor Loadings",
+        "rpt_cbsem_section_reliability": "3.2. Reliability & Convergent Validity",
+        "rpt_cbsem_section_fl": "3.3. Discriminant Validity — Fornell-Larcker",
+        "rpt_cbsem_section_htmt": "3.4. Discriminant Validity — HTMT",
+        "rpt_cbsem_section_structural": "4. Structural Model",
+        "rpt_cbsem_section_r2": "R²",
+    },
+}

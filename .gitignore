@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+uploads/*
+!uploads/.gitkeep
+
+# PyInstaller build output (see build_exe.bat) — the .exe is ~80MB and
+# regenerated from source, so it doesn't belong in version control.
+build/
+dist/
+dist_macos/
+*.spec

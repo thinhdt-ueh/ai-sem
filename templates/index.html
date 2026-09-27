@@ -1,0 +1,1038 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI-SEM</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header class="topbar">
+  <img class="brand-logo" src="{{ url_for('static', filename='img/logo-ai-sem-icon.png') }}" alt="AI-SEM">
+  <div class="brand"><span>AI-SEM</span><small class="brand-slogan">AI-Enabled for SEM</small></div>
+  <nav class="steps" id="stepNav">
+    <button class="step-btn active" data-step="1" data-i18n="nav_step1">1. Dữ liệu</button>
+    <button class="step-btn" data-step="2" data-i18n="nav_step2">2. Mô hình</button>
+    <button class="step-btn" data-step="3" data-i18n="nav_step3">3. Kết quả</button>
+  </nav>
+  <div class="lang-switch" id="langSwitch">
+    <button class="lang-btn" data-lang="vi">VI</button>
+    <button class="lang-btn active" data-lang="en">EN</button>
+  </div>
+  <a id="guideLink" class="btn ghost" target="_blank" rel="noopener" data-i18n="nav_guide">Hướng dẫn sử dụng</a>
+  <button id="sampleBtn" class="btn ghost" data-i18n="nav_sample" data-dataset="tam">Dùng dữ liệu mẫu</button>
+  <button id="sampleModerationBtn" class="btn ghost" data-i18n="nav_sample_moderation" data-dataset="moderation">Dữ liệu mẫu (Mediator + Moderator)</button>
+</header>
+
+<main>
+  <!-- STEP 1: DATA -->
+  <section class="step-panel active" id="panel-1">
+    <div class="panel-card">
+      <div class="ai-provider-tabs" id="dataSourceTabs">
+        <button type="button" class="ai-provider-tab active" data-source="upload" data-i18n="s1_tab_upload">📁 Tải lên dữ liệu</button>
+        <button type="button" class="ai-provider-tab" data-source="ai_gen" data-i18n="s1_tab_ai_gen">🤖 Sinh dữ liệu bằng AI</button>
+        <button type="button" class="ai-provider-tab" data-source="ai_experiment" data-i18n="s1_tab_ai_experiment">🧪 AI Lab Experiment</button>
+      </div>
+
+      <div id="uploadSourcePane">
+        <h2 data-i18n="s1_title">Tải lên dữ liệu khảo sát</h2>
+        <p class="hint" data-i18n="s1_hint">Hỗ trợ CSV hoặc Excel (.xlsx). Mỗi cột là một biến quan sát (item), mỗi dòng là một quan sát.</p>
+        <div class="dropzone" id="dropzone">
+          <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" hidden>
+          <p><span data-i18n="s1_dropzone_text">Kéo thả file vào đây hoặc</span> <button class="link-btn" id="browseBtn" data-i18n="s1_browse">chọn file</button></p>
+          <p class="dz-filename" id="dzFilename"></p>
+        </div>
+        <div id="uploadError" class="error-box hidden"></div>
+      </div>
+
+      <div id="aiGenSourcePane" class="hidden">
+        <div class="ai-gen-steps" id="aiGenSteps">
+          <span class="ai-gen-step-dot active reached" data-substep="1"><span class="num">1</span></span>
+          <span class="ai-gen-step-dot" data-substep="2"><span class="num">2</span></span>
+          <span class="ai-gen-step-dot" data-substep="3"><span class="num">3</span></span>
+          <span class="ai-gen-step-dot" data-substep="4"><span class="num">4</span></span>
+        </div>
+
+        <div class="codebook-actions">
+          <button class="btn ghost" id="aiGenExportAllBtn" data-i18n="s1_ai_all_config_export">⬇ Xuất toàn bộ cấu hình (CSV)</button>
+          <button class="btn ghost" id="aiGenImportAllBtn" data-i18n="s1_ai_all_config_import">⬆ Nhập toàn bộ cấu hình (CSV)</button>
+          <input type="file" id="aiGenImportAllInput" accept=".csv" hidden>
+        </div>
+        <div id="aiGenImportAllError" class="error-box hidden"></div>
+
+        <div class="ai-gen-shared-provider">
+          <label data-i18n="ai_modal_provider_label">AI Provider</label>
+          <div class="ai-provider-tabs" id="aiGenProviderTabs"></div>
+
+          <label data-i18n="ai_modal_api_key_label">Your API key</label>
+          <div class="ai-key-row">
+            <input type="password" id="aiGenApiKey" autocomplete="off">
+            <button type="button" class="btn ghost" id="aiGenKeyToggle">👁</button>
+          </div>
+          <p class="hint" id="aiGenApiKeyHint"></p>
+          <label class="checkbox-row">
+            <input type="checkbox" id="aiGenRememberKey">
+            <span data-i18n="ai_modal_remember_key">Ghi nhớ key này trên trình duyệt này (localStorage)</span>
+          </label>
+
+          <label data-i18n="ai_modal_model_label">Model</label>
+          <input type="text" id="aiGenModel" list="aiGenModelSuggestions">
+          <datalist id="aiGenModelSuggestions"></datalist>
+          <p class="hint" data-i18n="ai_modal_model_hint">Đây là danh sách gợi ý, không giới hạn.</p>
+
+          <label><span data-i18n="ai_modal_temperature_label">Độ sáng tạo (temperature)</span> — <span id="aiGenTemperatureValue">1.0</span></label>
+          <div class="ai-temp-row">
+            <span class="ai-temp-endpoint" data-i18n="ai_modal_temperature_low">Chính xác</span>
+            <input type="range" id="aiGenTemperature" min="0" max="1" step="0.1" value="1">
+            <span class="ai-temp-endpoint" data-i18n="ai_modal_temperature_high">Sáng tạo</span>
+          </div>
+        </div>
+
+        <div class="ai-gen-substep active" id="aiGenStep1">
+          <h2 data-i18n="s1_ai_codebook_title">Bước 1: Định nghĩa câu hỏi khảo sát</h2>
+          <p class="hint" data-i18n="s1_ai_codebook_hint">Mỗi dòng là một biến quan sát (indicator).</p>
+
+          <div class="ai-gen-construct-search">
+            <button type="button" class="btn ghost" id="constructSearchToggleBtn" data-i18n="s1_ai_construct_search_toggle">🔍 Tìm construct &amp; indicator bằng AI (literature review)</button>
+            <div id="constructSearchPanel" class="hidden">
+              <label data-i18n="s1_ai_construct_search_topic_label">Chủ đề / bối cảnh nghiên cứu</label>
+              <textarea id="constructSearchTopic" rows="2" data-i18n-placeholder="s1_ai_construct_search_topic_placeholder"></textarea>
+              <div class="ai-gen-form-row">
+                <div>
+                  <label data-i18n="s1_ai_construct_search_count_label">Số construct mong muốn</label>
+                  <input type="number" id="constructSearchCount" min="1" max="10" value="5">
+                </div>
+              </div>
+              <button type="button" class="btn primary" id="constructSearchRunBtn" data-i18n="s1_ai_construct_search_run">Tìm construct</button>
+              <div id="constructSearchError" class="error-box hidden"></div>
+              <p class="hint hidden" id="constructSearchLoading" data-i18n="s1_ai_construct_search_loading">Đang tìm kiếm...</p>
+
+              <div id="constructSearchResults" class="hidden">
+                <p class="hint hidden" id="constructSearchDisclaimer" data-i18n="s1_ai_construct_search_disclaimer">⚠️ Trích dẫn do AI tạo ra — vui lòng kiểm chứng trước khi dùng chính thức.</p>
+                <div id="constructSearchGroups"></div>
+                <div class="ai-gen-nav">
+                  <button type="button" class="btn" id="constructSearchCancelBtn" data-i18n="s1_ai_construct_search_cancel">Huỷ</button>
+                  <button type="button" class="btn primary" id="constructSearchAddBtn" data-i18n="s1_ai_construct_search_add">+ Thêm mục đã chọn vào bảng</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-scroll">
+            <table class="codebook-table" id="codebookTable">
+              <thead>
+                <tr>
+                  <th data-i18n="s1_ai_codebook_col_column">Tên cột</th>
+                  <th data-i18n="s1_ai_codebook_col_construct">Construct</th>
+                  <th data-i18n="s1_ai_codebook_col_question">Nội dung câu hỏi phỏng vấn</th>
+                  <th data-i18n="s1_ai_codebook_col_type">Loại câu hỏi</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="codebookTableBody"></tbody>
+            </table>
+          </div>
+          <div class="codebook-actions">
+            <button class="btn" id="codebookAddRowBtn" data-i18n="s1_ai_codebook_add_row">+ Thêm biến quan sát</button>
+            <button class="btn ghost" id="codebookExportBtn" data-i18n="s1_ai_codebook_export">⬇ Xuất định nghĩa</button>
+            <button class="btn ghost" id="codebookImportBtn" data-i18n="s1_ai_codebook_import">⬆ Nhập định nghĩa</button>
+            <input type="file" id="codebookImportInput" accept=".json" hidden>
+          </div>
+          <p class="hint" data-i18n="s1_ai_codebook_import_hint">Chấp nhận file định nghĩa (JSON) hoặc file mô hình đã xuất ở Bước 2 (construct + indicator).</p>
+          <div id="codebookImportError" class="error-box hidden"></div>
+          <div id="codebookValidationError" class="error-box hidden"></div>
+          <div class="ai-gen-nav">
+            <button class="btn ghost" id="skipToModelBtn" data-i18n="s2_ai_draw_paths_skip_shortcut">⏭ Bỏ qua, sang bước tạo mô hình</button>
+            <button class="btn primary" id="codebookNextBtn" data-i18n="s1_ai_next">Tiếp theo →</button>
+          </div>
+        </div>
+
+        <div class="ai-gen-substep" id="aiGenStep2">
+          <h2 data-i18n="s1_ai_demo_title">Bước 2: Đối tượng khảo sát</h2>
+          <p class="hint" data-i18n="s1_ai_demo_hint">Tất cả các trường đều tuỳ chọn.</p>
+          <div class="ai-gen-form-row">
+            <div>
+              <label data-i18n="s1_ai_demo_age">Độ tuổi</label>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input type="number" id="demoAgeMin" min="0" max="120">
+                <span data-i18n="s1_ai_demo_age_to">đến</span>
+                <input type="number" id="demoAgeMax" min="0" max="120">
+              </div>
+            </div>
+            <div>
+              <label data-i18n="s1_ai_demo_gender">Giới tính</label>
+              <select id="demoGenderMix">
+                <option value="any" data-i18n="s1_ai_demo_gender_any">Không giới hạn</option>
+                <option value="balanced" data-i18n="s1_ai_demo_gender_balanced">Cân bằng nam/nữ</option>
+                <option value="mostly_male" data-i18n="s1_ai_demo_gender_mostly_male">Chủ yếu nam</option>
+                <option value="mostly_female" data-i18n="s1_ai_demo_gender_mostly_female">Chủ yếu nữ</option>
+              </select>
+            </div>
+          </div>
+          <div class="ai-gen-form-row">
+            <div>
+              <label data-i18n="s1_ai_demo_occupation">Nghề nghiệp / học vấn</label>
+              <input type="text" id="demoOccupation" data-i18n-placeholder="s1_ai_demo_occupation_placeholder">
+            </div>
+            <div>
+              <label data-i18n="s1_ai_demo_location">Khu vực</label>
+              <input type="text" id="demoLocation" data-i18n-placeholder="s1_ai_demo_location_placeholder">
+            </div>
+          </div>
+          <label data-i18n="s1_ai_demo_target_population">Mô tả đặc thù đối tượng khảo sát</label>
+          <p class="hint" data-i18n="s1_ai_demo_target_population_hint">Mô tả càng chi tiết càng tốt.</p>
+          <textarea id="demoTargetPopulation" rows="3" data-i18n-placeholder="s1_ai_demo_target_population_placeholder"></textarea>
+
+          <h3 data-i18n="s1_ai_demo_attrs_title">Thuộc tính demographic bổ sung (tuỳ chọn)</h3>
+          <p class="hint" data-i18n="s1_ai_demo_attrs_hint">Số (khoảng min-max) hoặc phân loại (danh sách lựa chọn cách nhau bởi dấu phẩy).</p>
+          <div class="table-scroll">
+            <table class="codebook-table" id="demoAttrsTable">
+              <thead>
+                <tr>
+                  <th data-i18n="s1_ai_demo_attrs_col_name">Tên thuộc tính</th>
+                  <th data-i18n="s1_ai_demo_attrs_col_type">Kiểu</th>
+                  <th data-i18n="s1_ai_demo_attrs_col_value">Khoảng số hoặc danh sách lựa chọn</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="demoAttrsTableBody"></tbody>
+            </table>
+          </div>
+          <div class="codebook-actions">
+            <button class="btn" id="demoAttrsAddRowBtn" data-i18n="s1_ai_demo_attrs_add_row">+ Thêm thuộc tính</button>
+          </div>
+          <div id="demoAttrsValidationError" class="error-box hidden"></div>
+
+          <div class="ai-gen-nav">
+            <button class="btn" id="demoBackBtn" data-i18n="s1_ai_back">← Quay lại</button>
+            <button class="btn primary" id="demoNextBtn" data-i18n="s1_ai_next">Tiếp theo →</button>
+          </div>
+        </div>
+
+        <div class="ai-gen-substep" id="aiGenStep3">
+          <h2 data-i18n="s1_ai_config_title">Bước 3: Cấu hình &amp; Prompt</h2>
+
+          <div class="ai-gen-form-row">
+            <div>
+              <label data-i18n="s1_ai_config_n_rows">Số quan sát cần sinh</label>
+              <input type="number" id="aiGenNRows" min="30" max="500" value="200">
+              <p class="hint" id="aiGenNRowsHint"></p>
+            </div>
+            <div>
+              <label data-i18n="s1_ai_config_likert">Thang đo Likert</label>
+              <label class="radio-row"><input type="radio" name="aiGenLikert" value="5" checked> <span data-i18n="s1_ai_config_likert5">5 mức (1-5)</span></label>
+              <label class="radio-row"><input type="radio" name="aiGenLikert" value="7"> <span data-i18n="s1_ai_config_likert7">7 mức (1-7)</span></label>
+            </div>
+            <div>
+              <label data-i18n="s1_ai_config_batch_size">Số dòng mỗi lần gọi AI</label>
+              <input type="number" id="aiGenBatchSize" min="1" max="50" value="25">
+              <p class="hint" data-i18n="s1_ai_config_batch_size_hint">Từ 1 đến 50.</p>
+            </div>
+          </div>
+
+          <details open>
+            <summary data-i18n="s1_ai_config_system_prompt_label">Prompt hệ thống (có thể chỉnh sửa)</summary>
+            <textarea class="ai-gen-prompt-preview" id="aiGenSystemPromptPreview" rows="8"></textarea>
+          </details>
+
+          <label data-i18n="s1_ai_config_user_prompt_label">Yêu cầu gửi AI (có thể chỉnh sửa)</label>
+          <textarea id="aiGenUserPrompt" rows="4"></textarea>
+          <button class="btn ghost" id="aiGenRegenBtn" data-i18n="s1_ai_config_regenerate">🔄 Gợi ý lại</button>
+
+          <label data-i18n="s1_ai_config_first_batch_preview_label">Xem trước: nội dung thực tế gửi AI cho lô đầu tiên</label>
+          <div class="ai-gen-prompt-preview" id="aiGenFirstBatchPreview"></div>
+
+          <div id="aiGenConfigError" class="error-box hidden"></div>
+          <div class="ai-gen-nav">
+            <button class="btn" id="configBackBtn" data-i18n="s1_ai_back">← Quay lại</button>
+            <button class="btn primary" id="aiGenStartBtn" data-i18n="s1_ai_config_generate_btn">▶ Sinh dữ liệu</button>
+          </div>
+        </div>
+
+        <div class="ai-gen-substep" id="aiGenStep4">
+          <div class="ai-gen-progress-wrap" id="aiGenProgressWrap">
+            <progress id="aiGenProgressBar" max="1" value="0"></progress>
+            <p class="ai-gen-progress-text" id="aiGenProgressText"></p>
+          </div>
+          <div id="aiGenError" class="error-box hidden"></div>
+          <div class="ai-gen-result-actions hidden" id="aiGenErrorActions">
+            <button class="btn" id="aiGenRetryBtn" data-i18n="s1_ai_gen_retry_batch">Thử lại lô này</button>
+            <button class="btn ghost" id="aiGenCancelBtn" data-i18n="s1_ai_gen_cancel">Huỷ</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="aiExperimentSourcePane" class="hidden">
+        <div class="ai-gen-steps" id="expSteps">
+          <span class="ai-gen-step-dot active reached" data-substep="1"><span class="num">1</span></span>
+          <span class="ai-gen-step-dot" data-substep="2"><span class="num">2</span></span>
+          <span class="ai-gen-step-dot" data-substep="3"><span class="num">3</span></span>
+          <span class="ai-gen-step-dot" data-substep="4"><span class="num">4</span></span>
+        </div>
+
+        <!-- Sub-step 1: define the worker population and generate the pool -->
+        <div class="ai-gen-substep active" id="expStep1">
+          <h2 data-i18n="exp_step1_title">Bước 1: Định nghĩa nhóm AI Worker (participants)</h2>
+          <p class="hint" data-i18n="exp_step1_hint">Mô tả tổng thể đối tượng tham gia, sau đó AI sẽ tạo ra N hồ sơ AI Worker (persona + demographics), chưa trả lời khảo sát.</p>
+
+          <div class="codebook-actions">
+            <button class="btn ghost" id="expPoolImportBtn" data-i18n="exp_pool_import">⬆ Import Worker Pool có sẵn (Excel)</button>
+            <a class="btn ghost" id="expPoolTemplateBtn" href="/api/ai_worker/pool_import_template" data-i18n="exp_pool_template">⬇ Tải file mẫu (Excel)</a>
+            <input type="file" id="expPoolImportInput" accept=".xlsx,.xls,.csv" hidden>
+          </div>
+          <div id="expPoolImportError" class="error-box hidden"></div>
+
+          <label data-i18n="exp_population_prompt_label">Mô tả tổng thể đối tượng (population)</label>
+          <textarea id="expPopulationPrompt" rows="3" data-i18n-placeholder="exp_population_prompt_placeholder"></textarea>
+
+          <div class="ai-gen-form-row">
+            <div>
+              <label data-i18n="s1_ai_demo_age">Độ tuổi</label>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input type="number" id="expDemoAgeMin" min="0" max="120">
+                <span data-i18n="s1_ai_demo_age_to">đến</span>
+                <input type="number" id="expDemoAgeMax" min="0" max="120">
+              </div>
+            </div>
+            <div>
+              <label data-i18n="s1_ai_demo_gender">Giới tính</label>
+              <select id="expDemoGenderMix">
+                <option value="any" data-i18n="s1_ai_demo_gender_any">Không giới hạn</option>
+                <option value="balanced" data-i18n="s1_ai_demo_gender_balanced">Cân bằng nam/nữ</option>
+                <option value="mostly_male" data-i18n="s1_ai_demo_gender_mostly_male">Chủ yếu nam</option>
+                <option value="mostly_female" data-i18n="s1_ai_demo_gender_mostly_female">Chủ yếu nữ</option>
+              </select>
+            </div>
+          </div>
+          <div class="ai-gen-form-row">
+            <div>
+              <label data-i18n="s1_ai_demo_occupation">Nghề nghiệp / học vấn</label>
+              <input type="text" id="expDemoOccupation" data-i18n-placeholder="s1_ai_demo_occupation_placeholder">
+            </div>
+            <div>
+              <label data-i18n="s1_ai_demo_location">Khu vực</label>
+              <input type="text" id="expDemoLocation" data-i18n-placeholder="s1_ai_demo_location_placeholder">
+            </div>
+          </div>
+          <label data-i18n="s1_ai_demo_target_population">Mô tả đặc thù đối tượng khảo sát</label>
+          <textarea id="expDemoTargetPopulation" rows="2" data-i18n-placeholder="s1_ai_demo_target_population_placeholder"></textarea>
+
+          <h3 data-i18n="s1_ai_demo_attrs_title">Thuộc tính demographic bổ sung (tuỳ chọn)</h3>
+          <p class="hint" data-i18n="s1_ai_demo_attrs_hint">Số (khoảng min-max) hoặc phân loại (danh sách lựa chọn cách nhau bởi dấu phẩy).</p>
+          <div class="table-scroll">
+            <table class="codebook-table" id="expDemoAttrsTable">
+              <thead>
+                <tr>
+                  <th data-i18n="s1_ai_demo_attrs_col_name">Tên thuộc tính</th>
+                  <th data-i18n="s1_ai_demo_attrs_col_type">Kiểu</th>
+                  <th data-i18n="s1_ai_demo_attrs_col_value">Khoảng số hoặc danh sách lựa chọn</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="expDemoAttrsTableBody"></tbody>
+            </table>
+          </div>
+          <div class="codebook-actions">
+            <button class="btn" id="expDemoAttrsAddRowBtn" data-i18n="s1_ai_demo_attrs_add_row">+ Thêm thuộc tính</button>
+          </div>
+          <div id="expDemoAttrsValidationError" class="error-box hidden"></div>
+
+          <div class="ai-gen-shared-provider">
+            <div class="ai-gen-form-row">
+              <div>
+                <label data-i18n="exp_n_workers_label">Số AI Worker cần tạo (N)</label>
+                <input type="number" id="expNWorkers" min="30" max="500" value="100">
+                <p class="hint" id="expNWorkersHint"></p>
+              </div>
+              <div>
+                <label data-i18n="s1_ai_config_batch_size">Số dòng mỗi lần gọi AI</label>
+                <input type="number" id="expBatchSize" min="1" max="50" value="25">
+                <p class="hint" data-i18n="s1_ai_config_batch_size_hint">Từ 1 đến 50.</p>
+              </div>
+            </div>
+
+            <label data-i18n="ai_modal_provider_label">AI Provider</label>
+            <div class="ai-provider-tabs" id="expProviderTabs"></div>
+
+            <label data-i18n="ai_modal_api_key_label">Your API key</label>
+            <div class="ai-key-row">
+              <input type="password" id="expApiKey" autocomplete="off">
+              <button type="button" class="btn ghost" id="expKeyToggle">👁</button>
+            </div>
+            <p class="hint" id="expApiKeyHint"></p>
+            <label class="checkbox-row">
+              <input type="checkbox" id="expRememberKey">
+              <span data-i18n="ai_modal_remember_key">Ghi nhớ key này trên trình duyệt này (localStorage)</span>
+            </label>
+
+            <label data-i18n="ai_modal_model_label">Model</label>
+            <input type="text" id="expModel" list="expModelSuggestions">
+            <datalist id="expModelSuggestions"></datalist>
+
+            <label><span data-i18n="ai_modal_temperature_label">Độ sáng tạo (temperature)</span> — <span id="expTemperatureValue">1.0</span></label>
+            <div class="ai-temp-row">
+              <span class="ai-temp-endpoint" data-i18n="ai_modal_temperature_low">Chính xác</span>
+              <input type="range" id="expTemperature" min="0" max="1" step="0.1" value="1">
+              <span class="ai-temp-endpoint" data-i18n="ai_modal_temperature_high">Sáng tạo</span>
+            </div>
+          </div>
+
+          <label data-i18n="exp_combined_prompt_label">Prompt gửi AI (toàn bộ, có thể chỉnh sửa)</label>
+          <p class="hint" data-i18n="exp_combined_prompt_hint">Đây là toàn bộ nội dung sẽ gửi cho AI để tạo Worker Pool -- bạn có thể sửa trực tiếp trước khi chạy.</p>
+          <textarea class="ai-gen-prompt-preview" id="expCombinedPrompt" rows="10"></textarea>
+          <button class="btn ghost" id="expRegenBtn" data-i18n="s1_ai_config_regenerate">🔄 Gợi ý lại</button>
+
+          <label data-i18n="s1_ai_config_first_batch_preview_label">Xem trước: nội dung thực tế gửi AI cho lô đầu tiên</label>
+          <div class="ai-gen-prompt-preview" id="expFirstBatchPreview"></div>
+
+          <div id="expConfigError" class="error-box hidden"></div>
+          <div class="ai-gen-nav">
+            <button class="btn primary" id="expGenerateBtn" data-i18n="exp_generate_pool_btn">▶ Sinh Worker Pool</button>
+          </div>
+
+          <div class="ai-gen-progress-wrap hidden" id="expPoolProgressWrap">
+            <progress id="expPoolProgressBar" max="1" value="0"></progress>
+            <p class="ai-gen-progress-text" id="expPoolProgressText"></p>
+          </div>
+          <div id="expPoolError" class="error-box hidden"></div>
+          <div class="ai-gen-result-actions hidden" id="expPoolErrorActions">
+            <button class="btn" id="expPoolRetryBtn" data-i18n="s1_ai_gen_retry_batch">Thử lại lô này</button>
+            <button class="btn ghost" id="expPoolCancelBtn" data-i18n="s1_ai_gen_cancel">Huỷ</button>
+          </div>
+          <details id="expPoolLiveTransparencyWrap" class="hidden source-transparency-outer">
+            <summary data-i18n="exp_live_transparency_title">🔍 Minh bạch prompt (cập nhật theo từng lô đang chạy)</summary>
+            <div id="expPoolLiveTransparency" class="source-transparency"></div>
+          </details>
+        </div>
+
+        <!-- Sub-step 2: pool ready -->
+        <div class="ai-gen-substep" id="expStep2">
+          <h2 data-i18n="exp_step2_title">Bước 2: Worker Pool đã sẵn sàng</h2>
+          <p class="hint" id="expPoolSummary"></p>
+          <div class="table-scroll"><table id="expPoolPreviewTable"></table></div>
+          <div class="ai-gen-result-actions">
+            <a class="btn ghost" id="expPoolExportBtn" data-i18n="exp_pool_export">⬇ Xuất Worker Pool (Excel)</a>
+          </div>
+          <div class="ai-gen-nav">
+            <button class="btn" id="expPoolBackBtn" data-i18n="s1_ai_back">← Quay lại</button>
+            <button class="btn primary" id="expPoolNextBtn" data-i18n="s1_ai_next">Tiếp theo →</button>
+          </div>
+        </div>
+
+        <!-- Sub-step 3: design the experiment -->
+        <div class="ai-gen-substep" id="expStep3">
+          <h2 data-i18n="exp_step3_title">Bước 3: Thiết kế thực nghiệm</h2>
+          <div class="ai-gen-form-row">
+            <div>
+              <label data-i18n="exp_m_label">Số Worker tham gia khảo sát (M ≤ N)</label>
+              <input type="number" id="expM" min="1" value="30">
+              <p class="hint" id="expMHint"></p>
+            </div>
+          </div>
+
+          <label data-i18n="exp_shared_context_label">Bối cảnh chung (áp dụng cho mọi nhóm)</label>
+          <p class="hint" data-i18n="exp_shared_context_hint">Tình huống chung mà TẤT CẢ người tham gia đều trải qua, giống nhau giữa các nhóm — phần khác nhau giữa các nhóm nhập ở bảng "Thao túng" bên dưới.</p>
+          <textarea id="expSharedContext" rows="2" data-i18n-placeholder="exp_shared_context_placeholder"></textarea>
+
+          <h3 data-i18n="exp_groups_title">Nhóm điều kiện (Condition Groups)</h3>
+          <p class="hint" data-i18n="exp_groups_hint">Mỗi nhóm có một thao túng (manipulation) khác nhau; tổng số Worker của các nhóm phải bằng M.</p>
+          <div class="table-scroll">
+            <table class="codebook-table" id="expGroupsTable">
+              <thead>
+                <tr>
+                  <th data-i18n="exp_groups_col_condition">Thao túng (Manipulation)</th>
+                  <th data-i18n="exp_groups_col_size">Số Worker</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="expGroupsTableBody"></tbody>
+            </table>
+          </div>
+          <div class="codebook-actions">
+            <button class="btn" id="expGroupsAddRowBtn" data-i18n="exp_groups_add_row">+ Thêm nhóm điều kiện</button>
+          </div>
+          <div id="expGroupsValidationError" class="error-box hidden"></div>
+          <div class="ai-gen-nav">
+            <button class="btn primary" id="expSelectBtn" data-i18n="exp_select_btn">🎲 Chọn ngẫu nhiên Workers</button>
+          </div>
+
+          <div id="expSelectionResult" class="hidden">
+            <h3 data-i18n="exp_selected_title">Worker đã chọn theo nhóm</h3>
+            <div id="expSelectedLists"></div>
+            <h3 data-i18n="exp_excluded_title">Worker bị loại trừ (không tham gia khảo sát)</h3>
+            <p class="hint" id="expExcludedList"></p>
+          </div>
+
+          <h3 data-i18n="s1_ai_codebook_title">Bước 1: Định nghĩa câu hỏi khảo sát</h3>
+          <p class="hint" data-i18n="s1_ai_codebook_hint">Mỗi dòng là một biến quan sát (indicator).</p>
+          <div class="table-scroll">
+            <table class="codebook-table" id="expCodebookTable">
+              <thead>
+                <tr>
+                  <th data-i18n="s1_ai_codebook_col_column">Tên cột</th>
+                  <th data-i18n="s1_ai_codebook_col_construct">Construct</th>
+                  <th data-i18n="s1_ai_codebook_col_question">Nội dung câu hỏi phỏng vấn</th>
+                  <th data-i18n="s1_ai_codebook_col_type">Loại câu hỏi</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="expCodebookTableBody"></tbody>
+            </table>
+          </div>
+          <div class="codebook-actions">
+            <button class="btn" id="expCodebookAddRowBtn" data-i18n="s1_ai_codebook_add_row">+ Thêm biến quan sát</button>
+            <button class="btn ghost" id="expCodebookExportBtn" data-i18n="s1_ai_codebook_export">⬇ Xuất định nghĩa</button>
+            <button class="btn ghost" id="expCodebookImportBtn" data-i18n="s1_ai_codebook_import">⬆ Nhập định nghĩa</button>
+            <input type="file" id="expCodebookImportInput" accept=".json" hidden>
+          </div>
+          <p class="hint" data-i18n="s1_ai_codebook_import_hint">Chấp nhận file định nghĩa (JSON) hoặc file mô hình đã xuất ở Bước 2 (construct + indicator).</p>
+          <div id="expCodebookImportError" class="error-box hidden"></div>
+          <div id="expCodebookValidationError" class="error-box hidden"></div>
+
+          <div class="ai-gen-form-row">
+            <div>
+              <label data-i18n="s1_ai_config_likert">Thang đo Likert</label>
+              <label class="radio-row"><input type="radio" name="expLikert" value="5" checked> <span data-i18n="s1_ai_config_likert5">5 mức (1-5)</span></label>
+              <label class="radio-row"><input type="radio" name="expLikert" value="7"> <span data-i18n="s1_ai_config_likert7">7 mức (1-7)</span></label>
+            </div>
+            <div>
+              <label data-i18n="s1_ai_config_batch_size">Số dòng mỗi lần gọi AI</label>
+              <input type="number" id="expSurveyBatchSize" min="1" max="50" value="25">
+              <p class="hint" data-i18n="s1_ai_config_batch_size_hint">Từ 1 đến 50.</p>
+            </div>
+          </div>
+
+          <div id="expSurveyPromptPreviewWrap" class="hidden">
+            <h3 data-i18n="exp_survey_prompt_preview_title">Prompt gửi AI cho mỗi nhóm (toàn bộ, có thể chỉnh sửa)</h3>
+            <p class="hint" data-i18n="exp_survey_prompt_preview_hint">Đây là toàn bộ thông tin (hồ sơ từng Worker + điều kiện + câu hỏi khảo sát) sẽ gửi cho AI -- bạn có thể sửa trực tiếp trước khi chạy.</p>
+            <div id="expSurveyPromptGroups"></div>
+          </div>
+
+          <div id="expSurveyConfigError" class="error-box hidden"></div>
+          <div class="ai-gen-nav">
+            <button class="btn" id="expDesignBackBtn" data-i18n="s1_ai_back">← Quay lại</button>
+            <button class="btn primary" id="expSurveyPreviewBtn" data-i18n="exp_survey_preview_btn">🔍 Xem trước Prompt</button>
+          </div>
+          <div class="ai-gen-nav hidden" id="expSurveyConfirmNav">
+            <button class="btn ghost" id="expSurveyPreviewRegenBtn" data-i18n="s1_ai_config_regenerate">🔄 Gợi ý lại</button>
+            <button class="btn primary" id="expSurveyStartBtn" data-i18n="exp_survey_start_btn">▶ Sinh dữ liệu khảo sát</button>
+          </div>
+        </div>
+
+        <!-- Sub-step 4: batched survey generation + auto-finalize -->
+        <div class="ai-gen-substep" id="expStep4">
+          <div class="ai-gen-progress-wrap" id="expProgressWrap">
+            <progress id="expProgressBar" max="1" value="0"></progress>
+            <p class="ai-gen-progress-text" id="expProgressText"></p>
+          </div>
+          <div id="expError" class="error-box hidden"></div>
+          <div class="ai-gen-result-actions hidden" id="expErrorActions">
+            <button class="btn" id="expRetryBtn" data-i18n="s1_ai_gen_retry_batch">Thử lại lô này</button>
+            <button class="btn ghost" id="expCancelBtn" data-i18n="s1_ai_gen_cancel">Huỷ</button>
+          </div>
+          <details id="expLiveTransparencyWrap" class="hidden source-transparency-outer">
+            <summary data-i18n="exp_live_transparency_title">🔍 Minh bạch prompt (cập nhật theo từng lô đang chạy)</summary>
+            <div id="expLiveTransparency" class="source-transparency"></div>
+          </details>
+        </div>
+      </div>
+
+      <div id="dataPreviewWrap" class="hidden">
+        <h3 id="previewTitle"></h3>
+        <div class="table-scroll"><table id="previewTable"></table></div>
+        <div class="ai-gen-result-actions">
+          <button class="btn primary" id="toStep2Btn" data-i18n="s1_continue">Tiếp tục: Xây dựng mô hình →</button>
+          <a class="btn ghost hidden" id="aiGenDownloadLink" data-i18n="s1_ai_gen_download">⬇ Tải file CSV đã sinh</a>
+          <a class="btn ghost hidden" id="aiGenExportBtn" data-i18n="s1_ai_result_export_btn">⬇ Xuất toàn bộ (Excel)</a>
+        </div>
+      </div>
+
+      <div id="aiGenResultExtra" class="hidden">
+        <h3 data-i18n="s1_ai_result_demo_title">Đối tượng khảo sát</h3>
+        <div id="aiGenDemoSummary" class="ai-gen-demo-summary"></div>
+
+        <h3 data-i18n="s1_ai_result_stats_title">Thống kê mô tả</h3>
+        <div id="aiGenStatsTables"></div>
+
+        <p class="hint" data-i18n="s1_ai_result_transparency_hint">Mỗi lô sinh ra nhiều dòng từ CÙNG một prompt.</p>
+        <details class="source-transparency-outer">
+          <summary data-i18n="s1_ai_result_transparency_title">Minh bạch prompt theo lô</summary>
+          <div id="aiGenTransparency" class="source-transparency"></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 2: MODEL BUILDER -->
+  <section class="step-panel" id="panel-2">
+    <div class="builder-layout">
+      <div class="canvas-area">
+        <div class="toolbar">
+          <button class="btn" id="addConstructBtn" data-i18n="s2_add_construct">+ Construct</button>
+          <button class="btn" id="pathModeBtn" data-i18n="s2_draw_path">↗ Vẽ đường dẫn (Path)</button>
+          <button class="btn" id="aiDrawPathsBtn" data-i18n="s2_ai_draw_paths">🤖 AI vẽ mô hình</button>
+          <button class="btn hidden" id="dummyBtn" data-i18n="s2_dummy_btn">🔢 Tạo biến giả (dummy)</button>
+          <button class="btn hidden" id="qualScoreBtn" data-i18n="s2_qual_score_btn">🤖 Chấm điểm câu hỏi mở</button>
+          <button class="btn danger" id="deleteSelBtn" data-i18n="s2_delete_selected">🗑 Xoá mục chọn</button>
+          <span class="toolbar-sep"></span>
+          <a class="btn ghost hidden" id="step2ExportCsvBtn" data-i18n="s2_export_csv_btn">⬇ Xuất CSV dữ liệu</a>
+          <a class="btn ghost hidden" id="step2ExportExcelBtn" data-i18n="s2_export_excel_btn">⬇ Xuất Excel đầy đủ</a>
+          <button class="btn" id="exportModelBtn" data-i18n="s2_export_model">⬇ Xuất mô hình</button>
+          <button class="btn" id="importModelBtn" data-i18n="s2_import_model">⬆ Nhập mô hình</button>
+          <input type="file" id="importModelInput" accept=".json" hidden>
+          <button class="btn primary" id="saveAllProposalsBtn" data-i18n="s2_ai_paths_save_all">💾 Lưu toàn bộ đề xuất</button>
+          <span class="toolbar-hint" id="toolbarHint"></span>
+        </div>
+        <div id="modelImportError" class="error-box hidden"></div>
+        <canvas id="modelCanvas" width="1000" height="560"></canvas>
+        <div id="modelRationalePanel" class="reading-guide hidden">
+          <details open>
+            <summary data-i18n="s2_ai_rationale_title">📖 Giải thích mô hình (AI)</summary>
+            <div class="reading-guide-body">
+              <p class="hint" data-i18n="s2_ai_rationale_hint">Do AI tạo ra — vui lòng kiểm chứng trước khi dùng chính thức.</p>
+              <p id="modelRationaleText" style="white-space: pre-wrap;"></p>
+            </div>
+          </details>
+        </div>
+      </div>
+      <aside class="side-panel" id="constructPanel">
+        <h3 data-i18n="s2_method_title">Phương pháp ước lượng</h3>
+        <select id="estimationMethod">
+          <option value="pls" selected data-i18n="s2_method_pls">PLS-SEM (Partial Least Squares)</option>
+          <option value="cbsem" data-i18n="s2_method_cbsem">CB-SEM (Maximum Likelihood / Covariance-Based)</option>
+        </select>
+        <p class="hint" id="methodHint"></p>
+        <hr>
+        <h3 data-i18n="s2_construct_props">Thuộc tính Construct</h3>
+        <div id="noSelection" class="muted" data-i18n="s2_no_selection">Chọn một construct trên canvas để chỉnh sửa.</div>
+        <div id="constructForm" class="hidden">
+          <label data-i18n="s2_construct_name">Tên construct</label>
+          <input type="text" id="cName">
+          <div id="cTheoryBox" class="hint construct-theory-hint hidden"></div>
+          <label data-i18n="s2_measurement_type">Loại đo lường</label>
+          <select id="cMode">
+            <option value="A" data-i18n="s2_mode_reflective">Reflective (Mode A)</option>
+            <option value="B" data-i18n="s2_mode_formative">Formative (Mode B)</option>
+            <option value="I" data-i18n="s2_mode_interaction">Biến tương tác / điều tiết (Interaction, A × B)</option>
+          </select>
+          <div id="indicatorPickerSection">
+            <label data-i18n="s2_indicators_label">Biến quan sát (indicators)</label>
+            <div class="indicator-picker" id="indicatorPicker"></div>
+          </div>
+          <div id="interactionSourcesSection" class="hidden">
+            <p class="hint" data-i18n="s2_interaction_sources_label">Nguồn của biến tương tác (chọn 2 hoặc 3 construct)</p>
+            <label data-i18n="s2_interaction_source_a">Construct A</label>
+            <select id="cSourceA"></select>
+            <label data-i18n="s2_interaction_source_b">Construct B</label>
+            <select id="cSourceB"></select>
+            <label data-i18n="s2_interaction_source_c">Construct C (tuỳ chọn — tương tác 3 chiều)</label>
+            <select id="cSourceC"></select>
+            <div id="interactionSourceError" class="error-box hidden"></div>
+
+            <label data-i18n="s2_calc_method_label">Phương pháp tính (Calculation Method)</label>
+            <div class="radio-group" id="cCalcMethod">
+              <label class="radio-row"><input type="radio" name="cCalcMethod" value="product_indicator"><span data-i18n="s2_calc_method_product_indicator">Product Indicator</span></label>
+              <label class="radio-row"><input type="radio" name="cCalcMethod" value="two_stage" checked><span data-i18n="s2_calc_method_two_stage">Two Stage</span></label>
+              <label class="radio-row"><input type="radio" name="cCalcMethod" value="orthogonalization"><span data-i18n="s2_calc_method_orthogonalization">Orthogonalization</span></label>
+            </div>
+            <p class="hint" data-i18n="s2_calc_method_cbsem_note">Lưu ý: CB-SEM luôn dùng Two Stage, bất kể lựa chọn ở đây.</p>
+            <p class="hint hidden" id="cCalcMethodThreeWayNote" data-i18n="s2_interaction_three_way_two_stage_note">Tương tác 3 chiều chỉ hỗ trợ phương pháp Two Stage.</p>
+
+            <div id="productTermSection">
+              <label data-i18n="s2_product_term_label">Sinh Product Term (Advanced)</label>
+              <div class="radio-group" id="cProductTerm">
+                <label class="radio-row"><input type="radio" name="cProductTerm" value="unstandardized"><span data-i18n="s2_product_term_unstandardized">Unstandardized</span></label>
+                <label class="radio-row"><input type="radio" name="cProductTerm" value="mean_centered"><span data-i18n="s2_product_term_mean_centered">Mean Centered</span></label>
+                <label class="radio-row"><input type="radio" name="cProductTerm" value="standardized" checked><span data-i18n="s2_product_term_standardized">Standardized</span></label>
+              </div>
+              <p class="hint hidden" id="productTermTwoStageNote" data-i18n="s2_product_term_two_stage_note">Two Stage luôn nhân hai factor score giai đoạn 1 — vốn đã chuẩn hóa (standardized) sẵn theo định nghĩa (Henseler &amp; Chin, 2010), nên không có lựa chọn nào khác ở đây để chọn thêm.</p>
+            </div>
+          </div>
+        </div>
+        <hr>
+        <h3 data-i18n="s2_model_overview">Tổng quan mô hình</h3>
+        <ul class="model-summary" id="modelSummary"></ul>
+        <div id="modelError" class="error-box hidden"></div>
+        <div id="bootstrapSection">
+          <hr>
+          <h3 data-i18n="s2_bootstrapping">Bootstrapping</h3>
+          <label class="checkbox-row">
+            <input type="checkbox" id="bootstrapEnable" checked>
+            <span data-i18n="s2_bootstrap_enable">Kiểm định ý nghĩa thống kê (t-values, p-values)</span>
+          </label>
+          <div id="bootstrapOptions">
+            <label data-i18n="s2_bootstrap_reps_label">Số lần lặp lại mẫu (resamples)</label>
+            <select id="bootstrapReps">
+              <option value="100" data-i18n="s2_bootstrap_100">100 (nhanh)</option>
+              <option value="500" selected data-i18n="s2_bootstrap_500">500 (khuyến nghị)</option>
+              <option value="1000" data-i18n="s2_bootstrap_1000">1000</option>
+              <option value="2000" data-i18n="s2_bootstrap_2000">2000</option>
+              <option value="5000" data-i18n="s2_bootstrap_5000">5000 (chậm, ~30-60s)</option>
+            </select>
+            <p class="hint" data-i18n="s2_bootstrap_hint">Bootstrapping tạo nhiều mẫu lặp lại (resample) từ dữ liệu gốc để ước
+              lượng độ lệch chuẩn, t-value và p-value cho từng path coefficient — cần thiết để
+              báo cáo mức ý nghĩa thống kê (p &lt; 0.05) trong nghiên cứu.</p>
+          </div>
+        </div>
+        <p class="hint hidden" id="cbsemNote" data-i18n="s2_cbsem_note">CB-SEM tính sẵn SE/z-value/p-value bằng Maximum Likelihood — không cần bootstrapping.</p>
+        <button class="btn primary full" id="runAnalysisBtn"></button>
+      </aside>
+    </div>
+  </section>
+
+  <!-- STEP 3: RESULTS -->
+  <section class="step-panel" id="panel-3">
+    <div id="resultsLoading" class="hidden loading-box">
+      <p id="resultsLoadingMsg"></p>
+      <p id="resultsLoadingEta" class="eta-line hidden"></p>
+    </div>
+    <div id="resultsError" class="error-box hidden"></div>
+    <div id="resultsContent" class="hidden">
+      <div class="panel-card">
+        <div class="results-header">
+          <div>
+            <h2 style="margin-bottom:2px" data-i18n="s3_path_diagram_title">Sơ đồ đường dẫn kết quả (Path Diagram)</h2>
+            <p class="hint" id="convergenceInfo"></p>
+          </div>
+          <div class="export-buttons">
+            <button class="btn" id="ipmaBtn" data-i18n="s3_ipma_btn">🎯 IPMA</button>
+            <button class="btn" id="plspredictBtn" data-i18n="s3_plspredict_btn">🔮 PLSpredict</button>
+            <button class="btn" id="sensitivityBtn" data-i18n="s3_sensitivity_btn">📉 Phân tích độ nhạy cỡ mẫu</button>
+            <button class="btn" id="powerAnalysisBtn" data-i18n="s3_power_btn">⚡ Power Analysis</button>
+            <button class="btn" id="mlCompareBtn" data-i18n="s3_ml_compare_btn">🤖 So sánh Machine Learning</button>
+            <button class="btn" id="mgaBtn" data-i18n="s3_mga_btn">🔀 So sánh đa nhóm (PLS-MGA)</button>
+            <button class="btn" id="aiReportBtn" data-i18n="s3_ai_report_btn">🤖 Báo cáo AI</button>
+            <button class="btn" id="exportExcelBtn" data-i18n="s3_export_excel">📊 Xuất Excel</button>
+            <button class="btn" id="exportWordBtn" data-i18n="s3_export_word">📄 Xuất Word</button>
+          </div>
+        </div>
+        <p class="hint" data-i18n="s3_dashed_hint">Đường nét đứt = path không có ý nghĩa thống kê (p ≥ 0.05) theo kết quả Bootstrapping.</p>
+        <canvas id="resultCanvas" width="1000" height="560"></canvas>
+      </div>
+
+      <div class="results-grid">
+        <div class="panel-card">
+          <h2 data-i18n="s3_reliability_title">Độ tin cậy &amp; giá trị hội tụ (Reflective)</h2>
+          <div class="table-scroll"><table id="reliabilityTable"></table></div>
+        </div>
+        <div class="panel-card">
+          <h2 data-i18n="s3_loadings_title">Hệ số tải ngoài (Outer Loadings)</h2>
+          <div class="table-scroll"><table id="loadingsTable"></table></div>
+        </div>
+        <div class="panel-card">
+          <h2 data-i18n="s3_cross_loadings_title">Cross Loadings</h2>
+          <p class="hint" data-i18n="s3_cross_loadings_hint">Mỗi indicator nên tải cao nhất lên construct của chính nó.</p>
+          <div class="table-scroll"><table id="crossLoadingsTable"></table></div>
+        </div>
+        <div class="panel-card">
+          <h2 data-i18n="s3_fl_title">Giá trị phân biệt — Fornell-Larcker</h2>
+          <div class="table-scroll"><table id="flTable"></table></div>
+        </div>
+        <div class="panel-card">
+          <h2 data-i18n="s3_htmt_title">Giá trị phân biệt — HTMT</h2>
+          <div class="table-scroll"><table id="htmtTable"></table></div>
+          <div class="heatmap-legend" id="htmtLegend"></div>
+        </div>
+        <div class="panel-card">
+          <h2 data-i18n="s3_path_title">Mô hình cấu trúc — Path Coefficients &amp; f²</h2>
+          <div class="table-scroll"><table id="pathTable"></table></div>
+        </div>
+        <div class="panel-card">
+          <h2 data-i18n="s3_total_effects_title">Total &amp; Indirect Effects (Kiểm định Mediation)</h2>
+          <p class="hint" data-i18n="s3_total_effects_hint">Hiệu ứng gián tiếp = tổng tích các hệ số path dọc theo mọi đường đi qua biến trung gian (mediator); hiệu ứng tổng = trực tiếp + gián tiếp.</p>
+          <div class="table-scroll"><table id="totalEffectsTable"></table></div>
+        </div>
+        <div class="panel-card">
+          <h2 data-i18n="s3_specific_indirect_title">Hiệu ứng gián tiếp cụ thể (Specific Indirect Effects)</h2>
+          <p class="hint" data-i18n="s3_specific_indirect_hint">Mỗi dòng là một đường đi trung gian cụ thể — khác với bảng Total &amp; Indirect Effects vốn cộng gộp tất cả đường đi giữa một cặp construct. Nếu đã bootstrap, ý nghĩa thống kê được kiểm định trực tiếp trên tích của đúng lần lấy mẫu lại đó.</p>
+          <div class="table-scroll"><table id="specificIndirectTable"></table></div>
+        </div>
+        <div class="panel-card hidden" id="moderatedMediationSection">
+          <h2 data-i18n="s3_moderated_mediation_title">Index of Moderated Mediation (Hayes, 2015)</h2>
+          <p class="hint" data-i18n="s3_moderated_mediation_hint">Chỉ số đo hiệu ứng gián tiếp thay đổi bao nhiêu khi biến điều tiết tăng 1 đơn vị — cho các đường trung gian có đúng một đoạn (edge) bị điều tiết. Nếu đã bootstrap, ý nghĩa thống kê được kiểm định trực tiếp trên chỉ số này qua từng lần lấy mẫu lại.</p>
+          <div class="table-scroll"><table id="moderatedMediationTable"></table></div>
+        </div>
+        <div class="panel-card">
+          <h2 data-i18n="s3_r2q2_title">R² &amp; Q² của biến nội sinh (Predictive Relevance)</h2>
+          <div class="table-scroll"><table id="r2Table"></table></div>
+        </div>
+        <div class="panel-card">
+          <h2 data-i18n="s3_vif_title">Đa cộng tuyến (VIF)</h2>
+          <div class="table-scroll"><table id="vifTable"></table></div>
+        </div>
+        <div class="panel-card">
+          <h2 data-i18n="s3_cmb_title">Common Method Bias — Full Collinearity Test</h2>
+          <p class="hint" id="cmbHint"></p>
+          <div class="table-scroll"><table id="cmbTable"></table></div>
+        </div>
+      </div>
+      <div class="panel-card hidden" id="simpleSlopesSection">
+        <h2 data-i18n="s3_slopes_title">Biểu đồ độ dốc đơn giản (Simple Slopes)</h2>
+        <p class="hint" data-i18n="s3_slopes_hint">Quan hệ giữa biến độc lập và biến kết quả tại ba mức của biến điều tiết (−1SD, Trung bình, +1SD), tính từ các hệ số path chuẩn hoá của chính lần chạy này (Aiken &amp; West, 1991). Bấm "⇄" để đổi trục.</p>
+        <div id="simpleSlopesGrid" class="simple-slopes-grid"></div>
+      </div>
+      <div class="panel-card hidden" id="bootstrapHistSection">
+        <h2 data-i18n="s3_bootstrap_dist_title">Phân phối Bootstrap theo Path Coefficient</h2>
+        <p class="hint" id="bootstrapHistHint"></p>
+        <div id="bootstrapHistGrid" class="bootstrap-hist-grid"></div>
+      </div>
+      <div class="panel-card hidden" id="plspredictSection">
+        <h2 data-i18n="s3_plspredict_title">PLSpredict — Đánh giá khả năng dự báo ngoài mẫu</h2>
+        <p class="hint" data-i18n="s3_plspredict_hint">So sánh sai số dự báo (k-fold cross-validation) của mô hình PLS với một hồi quy tuyến tính đơn giản (LM) trên cùng dữ liệu — nếu PLS không thắng được LM, mô hình có thể thiếu giá trị dự báo thực tế dù R² trong mẫu cao (Shmueli et al., 2016).</p>
+        <p id="plspredictVerdict" class="hint"></p>
+        <div class="table-scroll"><table id="plspredictTable"></table></div>
+      </div>
+      <div class="panel-card hidden" id="ipmaSection">
+        <h2 id="ipmaTitle">IPMA</h2>
+        <p class="hint" data-i18n="s3_ipma_hint">Trục ngang: Importance (tổng hiệu ứng chuẩn hoá lên biến mục tiêu). Trục dọc: Performance (điểm trung bình quy về thang 0–100 theo dữ liệu quan sát). Đường chấm: giá trị trung bình — chia thành 4 vùng để xác định construct nào đáng ưu tiên cải thiện.</p>
+        <div class="chart-wrap"><canvas id="ipmaChart"></canvas><div id="ipmaTooltip" class="chart-tooltip hidden"></div></div>
+        <div class="table-scroll"><table id="ipmaTable"></table></div>
+      </div>
+      <div class="panel-card">
+        <h2 data-i18n="src_transparency_title">Minh bạch tính toán (Computation Transparency)</h2>
+        <p class="hint" data-i18n="src_transparency_hint">Mã nguồn Python thật sự đã chạy để tính ra các kết quả ở trên, lấy trực tiếp từ mã đang chạy trên server (không phải bản sao chép tay).</p>
+        <div id="sourceTransparency" class="source-transparency"></div>
+      </div>
+      <div class="panel-card">
+        <h2 data-i18n="results_guide_section_title">Hướng dẫn đọc &amp; Ý nghĩa các chỉ số</h2>
+        <div class="reading-guide">
+          <details>
+            <summary data-i18n="results_guide_measurement_summary">Mô hình đo lường (Outer Model)</summary>
+            <div class="reading-guide-body" data-i18n-html="results_guide_measurement_body">
+              <ul>
+                <li><strong>Outer Loadings:</strong> tương quan giữa mỗi indicator và construct chứa nó. Với construct reflective, nên ≥0.7; 0.4–0.7 có thể cân nhắc loại bỏ nếu việc loại không làm giảm AVE/độ tin cậy. <strong>Cross Loadings</strong> cho thấy mỗi indicator nên tải cao nhất lên đúng construct của chính nó, không phải construct khác.</li>
+                <li><strong>Cronbach's Alpha, rho_A, Composite Reliability (CR):</strong> đo độ tin cậy nhất quán nội bộ — thường xem ≥0.7 là chấp nhận được (0.6–0.7 có thể chấp nhận ở nghiên cứu khám phá).</li>
+                <li><strong>AVE (Average Variance Extracted):</strong> đo giá trị hội tụ — nên ≥0.5 (construct giải thích được ít nhất 50% phương sai của các indicator của nó).</li>
+              </ul>
+            </div>
+          </details>
+          <details>
+            <summary data-i18n="results_guide_discriminant_summary">Giá trị phân biệt (Discriminant Validity)</summary>
+            <div class="reading-guide-body" data-i18n-html="results_guide_discriminant_body">
+              <ul>
+                <li><strong>Fornell-Larcker:</strong> căn bậc hai AVE trên đường chéo nên lớn hơn tương quan giữa construct đó với bất kỳ construct nào khác.</li>
+                <li><strong>HTMT (Heterotrait-Monotrait Ratio):</strong> nên &lt;0.85 (khắt khe) hoặc &lt;0.90 (khi các construct gần nhau về khái niệm) theo Henseler et al. (2015); ≥0.90 là dấu hiệu vi phạm giá trị phân biệt.</li>
+              </ul>
+            </div>
+          </details>
+          <details>
+            <summary data-i18n="results_guide_structural_summary">Mô hình cấu trúc — Path Coefficients</summary>
+            <div class="reading-guide-body" data-i18n-html="results_guide_structural_body">
+              <ul>
+                <li><strong>Path coefficient (β chuẩn hoá):</strong> dấu (+/−) và độ lớn thể hiện chiều và cường độ quan hệ giữa hai construct.</li>
+                <li>Nếu đã bật <strong>Bootstrapping</strong>: các cột STDEV / T-Statistics / P-Values / Ý nghĩa cho biết path có ý nghĩa thống kê khi p &lt; 0.05 (tương đương |T| &gt; 1.96 với kiểm định 2 đuôi).</li>
+                <li><strong>f² (effect size):</strong> &lt;0.02 không đáng kể, 0.02–0.15 nhỏ, 0.15–0.35 vừa, ≥0.35 lớn (Cohen, 1988). Riêng path từ biến điều tiết (interaction) dùng ngưỡng nhỏ hơn nhiều: 0.005/0.01/0.025 (Kenny 2018; Aguinis et al. 2005).</li>
+              </ul>
+            </div>
+          </details>
+          <details>
+            <summary data-i18n="results_guide_mediation_summary">Hiệu ứng trung gian (Mediation)</summary>
+            <div class="reading-guide-body" data-i18n-html="results_guide_mediation_body">
+              <ul>
+                <li><strong>Total &amp; Indirect Effects:</strong> hiệu ứng gián tiếp = tổng tích các path coefficient dọc theo <em>mọi</em> đường đi qua biến trung gian, giữa một cặp construct; hiệu ứng tổng = trực tiếp + gián tiếp.</li>
+                <li><strong>Specific Indirect Effects:</strong> tách riêng <em>từng</em> đường đi trung gian cụ thể (thay vì cộng gộp như bảng trên) — nếu đã bootstrap, mỗi đường đi cũng được kiểm định ý nghĩa thống kê riêng, dựa trên đúng tích số của các hệ số trong cùng một lần lấy mẫu lại.</li>
+                <li><strong>Index of Moderated Mediation (Hayes, 2015):</strong> chỉ xuất hiện khi mô hình vừa có mediator vừa có moderator tác động lên đúng một đoạn của đường trung gian đó (Model 7/14 của PROCESS). Chỉ số này là <em>độ dốc</em> của hiệu ứng gián tiếp theo biến điều tiết — hiệu ứng gián tiếp thay đổi bao nhiêu khi biến điều tiết tăng 1 đơn vị. Nếu khoảng tin cậy 95% của chỉ số không chứa 0 → mức độ điều tiết lên hiệu ứng gián tiếp có ý nghĩa thống kê, một kiểm định chặt chẽ hơn việc chỉ so sánh "có ý nghĩa ở nhóm này nhưng không ở nhóm kia".</li>
+              </ul>
+            </div>
+          </details>
+          <details>
+            <summary data-i18n="results_guide_predictive_summary">R², Q² &amp; Đa cộng tuyến (VIF)</summary>
+            <div class="reading-guide-body" data-i18n-html="results_guide_predictive_body">
+              <ul>
+                <li><strong>R²:</strong> 0.19 yếu, 0.33 trung bình, 0.67 mạnh (Chin, 1998) — chỉ là ngưỡng tham khảo, tùy lĩnh vực nghiên cứu.</li>
+                <li><strong>Q² (Predictive Relevance, từ Blindfolding):</strong> &gt;0 nghĩa là mô hình có khả năng dự báo ngoài mẫu cho construct đó; ≤0 nghĩa là không.</li>
+                <li><strong>VIF (Inner/Outer):</strong> nên &lt;3.3 (hoặc &lt;5 nếu nới lỏng hơn) để tránh đa cộng tuyến làm méo các hệ số ước lượng.</li>
+              </ul>
+            </div>
+          </details>
+          <details>
+            <summary data-i18n="results_guide_cmb_summary">Common Method Bias</summary>
+            <div class="reading-guide-body" data-i18n-html="results_guide_cmb_body">
+              <p>Full collinearity VIF (Kock, 2015): mỗi construct được hồi quy trên <strong>tất cả</strong> construct còn lại trong mô hình, không chỉ predictor trực tiếp của nó. VIF ≤ ngưỡng (mặc định 3.3) nghĩa là không có dấu hiệu common method bias đáng kể.</p>
+            </div>
+          </details>
+          <details>
+            <summary data-i18n="results_guide_slopes_summary">Simple Slopes (khi có biến điều tiết)</summary>
+            <div class="reading-guide-body" data-i18n-html="results_guide_slopes_body">
+              <p>Ba đường tại −1SD / Trung bình / +1SD của biến điều tiết cho thấy quan hệ giữa biến độc lập và biến kết quả thay đổi ra sao theo mức độ của biến điều tiết (Aiken &amp; West, 1991). Ba đường càng tách xa nhau (không song song) → tương tác càng mạnh; ba đường gần như song song → tương tác yếu, dù hệ số path của interaction có ý nghĩa thống kê hay không.</p>
+            </div>
+          </details>
+          <details>
+            <summary data-i18n="results_guide_bootstrap_dist_summary">Phân phối Bootstrap (khi đã bật Bootstrapping)</summary>
+            <div class="reading-guide-body" data-i18n-html="results_guide_bootstrap_dist_body">
+              <p>Mỗi biểu đồ là phân phối của một hệ số path qua toàn bộ số lần lấy mẫu lại (resample). Vạch xanh liền = giá trị ước lượng gốc; vạch đỏ đứt = khoảng tin cậy 95% (percentile). Nếu khoảng tin cậy 95% không chứa 0, path đó có ý nghĩa thống kê.</p>
+            </div>
+          </details>
+        </div>
+      </div>
+      <button class="btn ghost" id="backToModelBtn" data-i18n="s3_back_to_model">← Quay lại chỉnh sửa mô hình</button>
+    </div>
+
+    <!-- CB-SEM results (separate layout: fit indices instead of Q²/VIF, ML z/p instead of bootstrap) -->
+    <div id="cbsemResultsContent" class="hidden">
+      <div class="panel-card">
+        <div class="results-header">
+          <div>
+            <h2 style="margin-bottom:2px" data-i18n="s3_path_diagram_title_cbsem">Sơ đồ đường dẫn kết quả (Path Diagram) — CB-SEM</h2>
+            <p class="hint" id="cbsemConvergenceInfo"></p>
+          </div>
+          <div class="export-buttons">
+            <button class="btn" id="cbsemSensitivityBtn" data-i18n="s3_sensitivity_btn">📉 Phân tích độ nhạy cỡ mẫu</button>
+            <button class="btn" id="cbsemPowerAnalysisBtn" data-i18n="s3_power_btn">⚡ Power Analysis</button>
+            <button class="btn" id="cbsemMlCompareBtn" data-i18n="s3_ml_compare_btn">🤖 So sánh Machine Learning</button>
+            <button class="btn" id="cbsemAiReportBtn" data-i18n="s3_ai_report_btn">🤖 Báo cáo AI</button>
+            <button class="btn" id="cbsemExportExcelBtn" data-i18n="s3_export_excel">📊 Xuất Excel</button>
+            <button class="btn" id="cbsemExportWordBtn" data-i18n="s3_export_word">📄 Xuất Word</button>
+          </div>
+        </div>
+        <p class="hint" data-i18n="s3_dashed_hint_cbsem">Hệ số hiển thị là standardized (β); đường nét đứt = không có ý nghĩa thống kê (p ≥ 0.05).</p>
+        <canvas id="cbsemResultCanvas" width="1000" height="560"></canvas>
+      </div>
+
+      <div class="panel-card">
+        <h2 data-i18n="cbsem_fit_title">Model Fit</h2>
+        <div class="table-scroll"><table id="cbsemFitTable"></table></div>
+      </div>
+
+      <div class="results-grid">
+        <div class="panel-card">
+          <h2 data-i18n="cbsem_reliability_title">Độ tin cậy &amp; giá trị hội tụ</h2>
+          <div class="table-scroll"><table id="cbsemReliabilityTable"></table></div>
+        </div>
+        <div class="panel-card">
+          <h2 data-i18n="cbsem_loadings_title">Factor Loadings</h2>
+          <div class="table-scroll"><table id="cbsemLoadingsTable"></table></div>
+        </div>
+        <div class="panel-card">
+          <h2 data-i18n="s3_fl_title">Giá trị phân biệt — Fornell-Larcker</h2>
+          <div class="table-scroll"><table id="cbsemFlTable"></table></div>
+        </div>
+        <div class="panel-card">
+          <h2 data-i18n="s3_htmt_title">Giá trị phân biệt — HTMT</h2>
+          <div class="table-scroll"><table id="cbsemHtmtTable"></table></div>
+          <div class="heatmap-legend" id="cbsemHtmtLegend"></div>
+        </div>
+        <div class="panel-card">
+          <h2 data-i18n="cbsem_path_title">Mô hình cấu trúc — Path Coefficients</h2>
+          <div class="table-scroll"><table id="cbsemPathTable"></table></div>
+        </div>
+        <div class="panel-card">
+          <h2 data-i18n="s3_total_effects_title">Total &amp; Indirect Effects (Kiểm định Mediation)</h2>
+          <p class="hint" data-i18n="s3_total_effects_hint">Hiệu ứng gián tiếp = tổng tích các hệ số path dọc theo mọi đường đi qua biến trung gian (mediator); hiệu ứng tổng = trực tiếp + gián tiếp.</p>
+          <div class="table-scroll"><table id="cbsemTotalEffectsTable"></table></div>
+        </div>
+        <div class="panel-card">
+          <h2 data-i18n="s3_specific_indirect_title">Hiệu ứng gián tiếp cụ thể (Specific Indirect Effects)</h2>
+          <p class="hint" data-i18n="s3_specific_indirect_hint">Mỗi dòng là một đường đi trung gian cụ thể — khác với bảng Total &amp; Indirect Effects vốn cộng gộp tất cả đường đi giữa một cặp construct. Nếu đã bootstrap, ý nghĩa thống kê được kiểm định trực tiếp trên tích của đúng lần lấy mẫu lại đó.</p>
+          <div class="table-scroll"><table id="cbsemSpecificIndirectTable"></table></div>
+        </div>
+        <div class="panel-card hidden" id="cbsemModeratedMediationSection">
+          <h2 data-i18n="s3_moderated_mediation_title">Index of Moderated Mediation (Hayes, 2015)</h2>
+          <p class="hint" data-i18n="s3_moderated_mediation_hint_cbsem">Chỉ số đo hiệu ứng gián tiếp thay đổi bao nhiêu khi biến điều tiết tăng 1 đơn vị — cho các đường trung gian có đúng một đoạn (edge) bị điều tiết. Ở CB-SEM đây là điểm ước lượng, chưa có kiểm định ý nghĩa thống kê riêng cho chỉ số này.</p>
+          <div class="table-scroll"><table id="cbsemModeratedMediationTable"></table></div>
+        </div>
+        <div class="panel-card">
+          <h2 data-i18n="cbsem_r2_title">R² của biến nội sinh</h2>
+          <p class="hint" data-i18n="cbsem_r2_hint">Đã hiệu chỉnh sai lệch đo lường — thường cao hơn R² của PLS-SEM trên cùng dữ liệu.</p>
+          <div class="table-scroll"><table id="cbsemR2Table"></table></div>
+        </div>
+        <div class="panel-card">
+          <h2 data-i18n="s3_cmb_title">Common Method Bias — Full Collinearity Test</h2>
+          <p class="hint" id="cbsemCmbHint"></p>
+          <div class="table-scroll"><table id="cbsemCmbTable"></table></div>
+        </div>
+      </div>
+      <div class="panel-card hidden" id="cbsemSimpleSlopesSection">
+        <h2 data-i18n="s3_slopes_title">Biểu đồ độ dốc đơn giản (Simple Slopes)</h2>
+        <p class="hint" data-i18n="s3_slopes_hint">Quan hệ giữa biến độc lập và biến kết quả tại ba mức của biến điều tiết (−1SD, Trung bình, +1SD), tính từ các hệ số path chuẩn hoá của chính lần chạy này (Aiken &amp; West, 1991). Bấm "⇄" để đổi trục.</p>
+        <div id="cbsemSimpleSlopesGrid" class="simple-slopes-grid"></div>
+      </div>
+      <div class="panel-card">
+        <h2 data-i18n="src_transparency_title">Minh bạch tính toán (Computation Transparency)</h2>
+        <p class="hint" data-i18n="src_transparency_hint">Mã nguồn Python thật sự đã chạy để tính ra các kết quả ở trên, lấy trực tiếp từ mã đang chạy trên server (không phải bản sao chép tay).</p>
+        <div id="cbsemSourceTransparency" class="source-transparency"></div>
+      </div>
+      <div class="panel-card">
+        <h2 data-i18n="results_guide_section_title">Hướng dẫn đọc &amp; Ý nghĩa các chỉ số</h2>
+        <div class="reading-guide">
+          <details>
+            <summary data-i18n="cbsem_guide_fit_summary">Model Fit</summary>
+            <div class="reading-guide-body" data-i18n-html="cbsem_guide_fit_body">
+              <ul>
+                <li><strong>Chi-square / df:</strong> càng nhỏ càng tốt — thường χ²/df &lt; 3 được xem là chấp nhận được.</li>
+                <li><strong>CFI, TLI:</strong> ≥0.90 chấp nhận được, ≥0.95 tốt.</li>
+                <li><strong>RMSEA:</strong> ≤0.08 chấp nhận được, ≤0.05 tốt.</li>
+                <li><strong>SRMR:</strong> ≤0.08 chấp nhận được.</li>
+                <li>Đây chỉ là ngưỡng tham khảo — nên xem xét nhiều chỉ số cùng lúc, không dựa hoàn toàn vào một chỉ số riêng lẻ.</li>
+              </ul>
+            </div>
+          </details>
+          <details>
+            <summary data-i18n="results_guide_measurement_summary">Mô hình đo lường (Outer Model)</summary>
+            <div class="reading-guide-body" data-i18n-html="cbsem_guide_measurement_body">
+              <ul>
+                <li><strong>Cronbach's Alpha, Composite Reliability (CR), AVE:</strong> ngưỡng tham khảo giống PLS-SEM — CR ≥0.7, AVE ≥0.5.</li>
+                <li><strong>Factor Loadings:</strong> cột Unstd./Std./SE/z/p — ý nghĩa thống kê dựa trên kiểm định z (Wald test) từ ước lượng Maximum Likelihood, khác với PLS-SEM (vốn luôn cần Bootstrap vì không có công thức sai số chuẩn dạng đóng).</li>
+              </ul>
+            </div>
+          </details>
+          <details>
+            <summary data-i18n="results_guide_discriminant_summary">Giá trị phân biệt (Discriminant Validity)</summary>
+            <div class="reading-guide-body" data-i18n-html="results_guide_discriminant_body">
+              <ul>
+                <li><strong>Fornell-Larcker:</strong> căn bậc hai AVE trên đường chéo nên lớn hơn tương quan giữa construct đó với bất kỳ construct nào khác.</li>
+                <li><strong>HTMT (Heterotrait-Monotrait Ratio):</strong> nên &lt;0.85 (khắt khe) hoặc &lt;0.90 (khi các construct gần nhau về khái niệm) theo Henseler et al. (2015); ≥0.90 là dấu hiệu vi phạm giá trị phân biệt.</li>
+              </ul>
+            </div>
+          </details>
+          <details>
+            <summary data-i18n="results_guide_structural_summary">Mô hình cấu trúc — Path Coefficients</summary>
+            <div class="reading-guide-body" data-i18n-html="cbsem_guide_structural_body">
+              <ul>
+                <li><strong>Unstd. (B):</strong> hệ số hồi quy chưa chuẩn hoá, theo đơn vị gốc của thang đo. <strong>Std. (β):</strong> hệ số đã chuẩn hoá, so sánh được giữa các path.</li>
+                <li><strong>SE, z, p:</strong> ý nghĩa thống kê được kiểm định bằng z-test (Wald test) trực tiếp từ ma trận hiệp phương sai ước lượng của Maximum Likelihood — không cần chạy Bootstrap như PLS-SEM. Path có ý nghĩa khi p &lt; 0.05.</li>
+              </ul>
+            </div>
+          </details>
+          <details>
+            <summary data-i18n="results_guide_mediation_summary">Hiệu ứng trung gian (Mediation)</summary>
+            <div class="reading-guide-body" data-i18n-html="cbsem_guide_mediation_body">
+              <ul>
+                <li><strong>Total &amp; Indirect Effects:</strong> hiệu ứng gián tiếp = tổng tích các path coefficient dọc theo <em>mọi</em> đường đi qua biến trung gian, giữa một cặp construct; hiệu ứng tổng = trực tiếp + gián tiếp.</li>
+                <li><strong>Specific Indirect Effects:</strong> tách riêng <em>từng</em> đường đi trung gian cụ thể — ở CB-SEM đây chỉ là điểm ước lượng (point estimate), <strong>chưa</strong> có kiểm định ý nghĩa thống kê riêng cho từng đường đi (cần một phương pháp riêng, ví dụ delta method/Sobel test, để suy ra sai số chuẩn của một tích số).</li>
+              </ul>
+            </div>
+          </details>
+          <details>
+            <summary data-i18n="cbsem_guide_r2cmb_summary">R² &amp; Common Method Bias</summary>
+            <div class="reading-guide-body" data-i18n-html="cbsem_guide_r2cmb_body">
+              <ul>
+                <li><strong>R²:</strong> 0.19 yếu, 0.33 trung bình, 0.67 mạnh (Chin, 1998) — R² của CB-SEM thường cao hơn PLS-SEM trên cùng dữ liệu vì đã hiệu chỉnh sai lệch đo lường.</li>
+                <li><strong>Common Method Bias (Full collinearity VIF, Kock 2015):</strong> mỗi construct được hồi quy trên tất cả construct còn lại; VIF ≤ ngưỡng (mặc định 3.3) nghĩa là không có dấu hiệu common method bias đáng kể.</li>
+              </ul>
+            </div>
+          </details>
+          <details>
+            <summary data-i18n="results_guide_slopes_summary">Simple Slopes (khi có biến điều tiết)</summary>
+            <div class="reading-guide-body" data-i18n-html="results_guide_slopes_body">
+              <p>Ba đường tại −1SD / Trung bình / +1SD của biến điều tiết cho thấy quan hệ giữa biến độc lập và biến kết quả thay đổi ra sao theo mức độ của biến điều tiết (Aiken &amp; West, 1991). Ba đường càng tách xa nhau (không song song) → tương tác càng mạnh; ba đường gần như song song → tương tác yếu, dù hệ số path của interaction có ý nghĩa thống kê hay không.</p>
+            </div>
+          </details>
+        </div>
+      </div>
+      <button class="btn ghost" id="cbsemBackToModelBtn" data-i18n="s3_back_to_model">← Quay lại chỉnh sửa mô hình</button>
+    </div>
+  </section>
+</main>
+
+{% include "footer.html" %}
+
+<div id="modalRoot"></div>
+
+<script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
+<script src="{{ url_for('static', filename='js/countdown.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ai_report_modal.js') }}"></script>
+<script src="{{ url_for('static', filename='js/diagram.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

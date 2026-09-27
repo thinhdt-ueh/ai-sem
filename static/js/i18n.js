@@ -1,0 +1,1842 @@
+/* Frontend VI/EN translation catalog + helpers. Independent from the backend
+ * catalog (i18n.py) — this one translates DOM text in the browser on language
+ * switch; the backend one translates error messages and exported report
+ * labels at request time. Loaded before diagram.js/app.js. */
+
+const LANG_STORAGE_KEY = "plssem_lang";
+
+const I18N = {
+  vi: {
+    // --- header / nav ---
+    nav_step1: "1. Dữ liệu",
+    nav_step2: "2. Mô hình",
+    nav_step3: "3. Kết quả",
+    nav_sample: "Dùng dữ liệu mẫu",
+    nav_sample_moderation: "Dữ liệu mẫu (Mediator + Moderator)",
+    nav_guide: "📖 Hướng dẫn sử dụng",
+
+    // --- step 1: upload ---
+    s1_title: "Tải lên dữ liệu khảo sát",
+    s1_hint: "Hỗ trợ CSV hoặc Excel (.xlsx). Mỗi cột là một biến quan sát (item), mỗi dòng là một quan sát. Tối đa 5000 dòng.",
+    s1_dropzone_text: "Kéo thả file vào đây hoặc",
+    s1_browse: "chọn file",
+    s1_preview_title: "Xem trước dữ liệu ({rows} dòng, {cols} cột)",
+    s1_continue: "Tiếp tục: Xây dựng mô hình →",
+    s1_selected_file: "Đã chọn: {name}",
+
+    s1_tab_upload: "📁 Tải lên dữ liệu",
+    s1_tab_ai_gen: "🤖 Phòng thí nghiệm với AI",
+    s1_ai_back: "← Quay lại",
+    s1_ai_next: "Tiếp theo →",
+
+    s1_ai_codebook_title: "Bước 1: Định nghĩa câu hỏi khảo sát",
+    s1_ai_codebook_hint: "Mỗi dòng là một biến quan sát (indicator). Nội dung câu hỏi giúp AI hiểu construct nào đang được đo để sinh dữ liệu nhất quán hơn.",
+    s1_ai_codebook_col_column: "Tên cột",
+    s1_ai_codebook_col_construct: "Construct",
+    s1_ai_codebook_col_question: "Nội dung câu hỏi phỏng vấn",
+    s1_ai_codebook_col_type: "Loại câu hỏi",
+    s1_ai_codebook_type_likert: "Định lượng (Likert)",
+    s1_ai_codebook_type_qualitative: "Định tính (văn bản)",
+    s1_ai_codebook_add_row: "+ Thêm biến quan sát",
+    s1_ai_codebook_remove: "Xoá",
+    s1_ai_codebook_export: "⬇ Xuất định nghĩa",
+    s1_ai_codebook_import: "⬆ Nhập định nghĩa",
+    s1_ai_codebook_import_hint: "Chấp nhận file định nghĩa (JSON) hoặc file mô hình đã xuất ở Bước 2 (construct + indicator).",
+    s1_ai_codebook_import_failed: "Nhập thất bại: {msg}",
+    s1_ai_codebook_duplicate_column: "Tên cột bị trùng: {name}",
+    s1_ai_codebook_empty_column: "Vui lòng đặt tên cho tất cả các cột.",
+    s1_ai_codebook_min_rows: "Vui lòng thêm ít nhất một biến quan sát.",
+
+    s1_ai_construct_search_toggle: "🔍 Tìm construct & indicator bằng AI (literature review)",
+    s1_ai_construct_search_topic_label: "Chủ đề / bối cảnh nghiên cứu",
+    s1_ai_construct_search_topic_placeholder: "VD: Ý định sử dụng ví điện tử của sinh viên, dựa trên mô hình TAM mở rộng",
+    s1_ai_construct_search_count_label: "Số construct mong muốn",
+    s1_ai_construct_search_run: "Tìm construct",
+    s1_ai_construct_search_loading: "Đang tìm kiếm...",
+    s1_ai_construct_search_cancel: "Huỷ",
+    s1_ai_construct_search_add: "+ Thêm mục đã chọn vào bảng",
+    s1_ai_construct_search_missing_topic: "Vui lòng nhập chủ đề / bối cảnh nghiên cứu.",
+    s1_ai_construct_search_disclaimer: "⚠️ Trích dẫn do AI tạo ra — vui lòng kiểm chứng trước khi dùng chính thức.",
+
+    s1_ai_all_config_export: "⬇ Xuất toàn bộ cấu hình (CSV)",
+    s1_ai_all_config_import: "⬆ Nhập toàn bộ cấu hình (CSV)",
+    s1_ai_all_config_import_failed: "Nhập cấu hình thất bại: {msg}",
+    s1_ai_all_config_import_bad_file: "File không đúng định dạng cấu hình.",
+
+    s1_ai_demo_title: "Bước 2: Đối tượng khảo sát",
+    s1_ai_demo_hint: "Tất cả các trường đều tuỳ chọn, nhưng càng cụ thể thì dữ liệu AI sinh ra càng thực tế.",
+    s1_ai_demo_age: "Độ tuổi",
+    s1_ai_demo_age_to: "đến",
+    s1_ai_demo_gender: "Giới tính",
+    s1_ai_demo_gender_any: "Không giới hạn",
+    s1_ai_demo_gender_balanced: "Cân bằng nam/nữ",
+    s1_ai_demo_gender_mostly_male: "Chủ yếu nam",
+    s1_ai_demo_gender_mostly_female: "Chủ yếu nữ",
+    s1_ai_demo_occupation: "Nghề nghiệp / học vấn",
+    s1_ai_demo_occupation_placeholder: "VD: sinh viên đại học",
+    s1_ai_demo_location: "Khu vực",
+    s1_ai_demo_location_placeholder: "VD: TP. Hồ Chí Minh",
+    s1_ai_demo_target_population: "Mô tả đặc thù đối tượng khảo sát",
+    s1_ai_demo_target_population_hint: "Mô tả càng chi tiết, dữ liệu sinh ra càng bám sát bối cảnh nghiên cứu của bạn.",
+    s1_ai_demo_target_population_placeholder: "VD: Sinh viên năm 3-4 ngành Kinh tế đã từng sử dụng ví điện tử trong 6 tháng qua",
+
+    s1_ai_demo_attrs_title: "Thuộc tính demographic bổ sung (tuỳ chọn)",
+    s1_ai_demo_attrs_hint: "Số (khoảng min-max) hoặc phân loại (danh sách lựa chọn cách nhau bởi dấu phẩy). Tối đa 6 thuộc tính.",
+    s1_ai_demo_attrs_col_name: "Tên thuộc tính",
+    s1_ai_demo_attrs_col_type: "Kiểu",
+    s1_ai_demo_attrs_col_value: "Khoảng số hoặc danh sách lựa chọn",
+    s1_ai_demo_attrs_add_row: "+ Thêm thuộc tính",
+    s1_ai_demo_attrs_type_numeric: "Số (khoảng)",
+    s1_ai_demo_attrs_type_categorical: "Phân loại (danh sách)",
+    s1_ai_demo_attrs_value_placeholder_numeric: "VD: 5,50",
+    s1_ai_demo_attrs_value_placeholder_categorical: "VD: THPT, Cao đẳng, Đại học, Sau đại học",
+    s1_ai_demo_attrs_invalid_numeric: "Thuộc tính '{name}': hãy nhập khoảng số dạng min,max (VD: 5,50).",
+    s1_ai_demo_attrs_invalid_categorical: "Thuộc tính '{name}': hãy nhập ít nhất 2 lựa chọn, cách nhau bởi dấu phẩy.",
+
+    s1_ai_config_title: "Bước 3: Cấu hình & Prompt",
+    s1_ai_config_n_rows: "Số quan sát cần sinh",
+    s1_ai_config_n_rows_hint: "Tối đa {max}, được chia thành các lô ~{batch} dòng mỗi lần gọi AI.",
+    s1_ai_config_likert: "Thang đo Likert",
+    s1_ai_config_likert5: "5 mức (1-5)",
+    s1_ai_config_likert7: "7 mức (1-7)",
+    s1_ai_config_batch_size: "Số dòng mỗi lần gọi AI",
+    s1_ai_config_batch_size_hint: "Từ 1 đến 50.",
+    s1_ai_config_system_prompt_label: "Prompt hệ thống (có thể chỉnh sửa)",
+    s1_ai_config_user_prompt_label: "Yêu cầu gửi AI (có thể chỉnh sửa)",
+    s1_ai_config_first_batch_preview_label: "Xem trước: nội dung thực tế gửi AI cho lô đầu tiên",
+    s1_ai_config_regenerate: "🔄 Gợi ý lại",
+    s1_ai_config_generate_btn: "▶ Sinh dữ liệu",
+    s1_ai_config_missing_key: "Vui lòng nhập API key.",
+
+    s1_ai_gen_progress: "Đang sinh lô {done}/{total}…",
+    s1_ai_gen_finalizing: "Đang hoàn tất…",
+    s1_ai_gen_error_batch: "Lỗi khi sinh dữ liệu: {detail}",
+    s1_ai_gen_error_incomplete: "chỉ sinh được {got}/{total} dòng sau nhiều lần gọi AI -- vui lòng thử lại hoặc giảm số dòng mỗi lần gọi.",
+    s1_ai_gen_retry_batch: "Thử lại lô này",
+    s1_ai_gen_cancel: "Huỷ",
+    s1_ai_gen_download: "⬇ Tải file CSV đã sinh",
+    s1_ai_gen_success: "Đã sinh thành công {n} quan sát.",
+
+    s1_ai_result_export_btn: "⬇ Xuất toàn bộ (Excel)",
+    s1_ai_result_demo_title: "Đối tượng khảo sát",
+    s1_ai_result_demo_occupation: "Nghề nghiệp / học vấn",
+    s1_ai_result_demo_location: "Khu vực",
+    s1_ai_result_demo_target_population: "Mô tả đối tượng mục tiêu",
+    s1_ai_result_demo_age_range: "Khoảng tuổi đã khai báo",
+    s1_ai_result_demo_gender_mix: "Tỷ lệ giới tính đã khai báo",
+    s1_ai_result_stats_title: "Thống kê mô tả",
+    s1_ai_result_stats_indicators_title: "Biến quan sát (thang Likert)",
+    s1_ai_result_stats_demo_title: "Nhân khẩu học người trả lời",
+    s1_ai_result_stats_col: "Cột",
+    s1_ai_result_stats_mean: "Trung bình",
+    s1_ai_result_stats_std: "Độ lệch chuẩn",
+    s1_ai_result_stats_min: "Nhỏ nhất",
+    s1_ai_result_stats_max: "Lớn nhất",
+    s1_ai_result_stats_age_row: "Tuổi (resp_age)",
+    s1_ai_result_stats_gender_col: "Giới tính",
+    s1_ai_result_stats_gender_male: "Nam",
+    s1_ai_result_stats_gender_female: "Nữ",
+    s1_ai_result_stats_option_col: "Lựa chọn",
+    s1_ai_result_stats_count: "Số lượng",
+    s1_ai_result_stats_pct: "Tỷ lệ (%)",
+    s1_ai_result_transparency_title: "Minh bạch prompt theo lô",
+    s1_ai_result_transparency_hint: "Mỗi lô sinh ra nhiều dòng dữ liệu từ CÙNG một prompt (không phải mỗi dòng một prompt riêng).",
+    s1_ai_result_transparency_batch: "Lô {n} — Dòng {start}-{end}",
+    s1_ai_result_transparency_system: "Prompt hệ thống",
+    s1_ai_result_transparency_user: "Yêu cầu gửi AI",
+
+    // --- step 1: AI Lab Experiment (worker pool + condition-based survey) ---
+    s1_tab_ai_experiment: "🧪 AI Lab Experiment",
+    exp_step1_title: "Bước 1: Định nghĩa nhóm AI Worker (participants)",
+    exp_step1_hint: "Mô tả tổng thể đối tượng tham gia, sau đó AI sẽ tạo ra N hồ sơ AI Worker (persona + demographics), chưa trả lời khảo sát.",
+    exp_pool_import: "⬆ Import Worker Pool có sẵn (Excel)",
+    exp_pool_template: "⬇ Tải file mẫu (Excel)",
+    exp_pool_import_failed: "Import thất bại: {msg}",
+    exp_population_prompt_label: "Mô tả tổng thể đối tượng (population)",
+    exp_population_prompt_placeholder: "VD: Nhân viên văn phòng 25-40 tuổi tại các thành phố lớn, đã từng mua sắm trực tuyến",
+    exp_n_workers_label: "Số AI Worker cần tạo (N)",
+    exp_n_workers_hint: "Tối đa 500 AI Worker, có thể dùng lại cho nhiều lần khảo sát sau này.",
+    exp_combined_prompt_label: "Prompt gửi AI (toàn bộ, có thể chỉnh sửa)",
+    exp_combined_prompt_hint: "Đây là toàn bộ nội dung sẽ gửi cho AI để tạo Worker Pool -- bạn có thể sửa trực tiếp trước khi chạy.",
+    exp_generate_pool_btn: "▶ Sinh Worker Pool",
+    exp_step2_title: "Bước 2: Worker Pool đã sẵn sàng",
+    exp_pool_ready_summary: "Đã tạo {n} AI Worker — có thể xuất Excel, hoặc tiếp tục thiết kế thực nghiệm.",
+    exp_pool_export: "⬇ Xuất Worker Pool (Excel)",
+    exp_step3_title: "Bước 3: Thiết kế thực nghiệm",
+    exp_m_label: "Số Worker tham gia khảo sát (M ≤ N)",
+    exp_m_hint: "Tổng số Worker trong các nhóm điều kiện: {total}/{m}.",
+    exp_shared_context_label: "Bối cảnh chung (áp dụng cho mọi nhóm)",
+    exp_shared_context_hint: "Tình huống chung mà TẤT CẢ người tham gia đều trải qua, giống nhau giữa các nhóm — phần khác nhau giữa các nhóm nhập ở bảng \"Thao túng\" bên dưới.",
+    exp_shared_context_placeholder: "VD: Bạn đang lướt xem một sản phẩm trên một trang thương mại điện tử...",
+    exp_groups_title: "Nhóm điều kiện (Condition Groups)",
+    exp_groups_hint: "Mỗi nhóm có một thao túng (manipulation) khác nhau; tổng số Worker của các nhóm phải bằng M. Tối đa 6 nhóm.",
+    exp_groups_col_condition: "Thao túng (Manipulation)",
+    exp_groups_col_size: "Số Worker",
+    exp_groups_add_row: "+ Thêm nhóm điều kiện",
+    exp_groups_min_rows: "Vui lòng thêm ít nhất một nhóm điều kiện.",
+    exp_groups_size_mismatch: "Tổng số Worker của các nhóm ({total}) phải bằng đúng M ({m}).",
+    exp_select_btn: "🎲 Chọn ngẫu nhiên Workers",
+    exp_selected_title: "Worker đã chọn theo nhóm",
+    exp_excluded_title: "Worker bị loại trừ (không tham gia khảo sát)",
+    exp_excluded_none: "Không có worker nào bị loại trừ (đã chọn hết N).",
+    exp_group_n: "Nhóm {n}",
+    exp_select_first: "Vui lòng bấm \"Chọn ngẫu nhiên Workers\" trước.",
+    exp_survey_prompt_preview_title: "Prompt gửi AI cho mỗi nhóm (toàn bộ, có thể chỉnh sửa)",
+    exp_survey_prompt_preview_hint: "Đây là toàn bộ thông tin (hồ sơ từng Worker + điều kiện + câu hỏi khảo sát) sẽ gửi cho AI -- bạn có thể sửa trực tiếp trước khi chạy.",
+    exp_survey_preview_btn: "🔍 Xem trước Prompt",
+    exp_survey_start_btn: "▶ Sinh dữ liệu khảo sát",
+    exp_live_transparency_title: "🔍 Minh bạch prompt (cập nhật theo từng lô đang chạy)",
+    exp_live_transparency_pool_batch: "Lô {n} — Dòng {start}-{end}",
+    exp_live_transparency_survey_batch: "Nhóm {group} — Lô {n} (worker: {ids})",
+
+    msg_upload_failed: "Upload thất bại.",
+    msg_sample_failed: "Không tải được dữ liệu mẫu.",
+
+    // --- step 2: model builder toolbar ---
+    s2_add_construct: "+ Construct",
+    s2_draw_path: "↗ Vẽ đường dẫn (Path)",
+    s2_ai_draw_paths: "🤖 AI vẽ mô hình",
+    s2_ai_draw_paths_disabled_hint: "Cần ít nhất 2 construct để AI đề xuất mô hình.",
+    s2_ai_paths_modal_title: "Dùng AI đề xuất mô hình cấu trúc",
+    s2_ai_paths_modal_hint: "AI sẽ suy luận đường dẫn giữa các construct hiện có dựa trên tên và biến quan sát của chúng.",
+    s2_ai_paths_context_label: "Bối cảnh nghiên cứu bổ sung (tuỳ chọn)",
+    s2_ai_paths_context_placeholder: "VD: Nghiên cứu về ý định sử dụng ví điện tử của sinh viên...",
+    s2_ai_paths_loading: "Đang phân tích và đề xuất mô hình...",
+    s2_ai_paths_run: "Đề xuất mô hình",
+    s2_ai_paths_review_title: "Xem trước mô hình do AI đề xuất",
+    s2_ai_paths_rationale_label: "Giải thích của AI",
+    s2_ai_paths_back: "← Quay lại",
+    s2_ai_paths_apply: "Áp dụng",
+    s2_ai_paths_applied: "Đã áp dụng {applied}/{total} đường dẫn đã chọn.",
+    s2_ai_paths_prompt_review_title: "Xem lại prompt trước khi gửi AI",
+    s2_ai_paths_prompt_review_hint: "Cấu trúc mô hình (đặc biệt biến điều tiết/tương tác) có thể mang tính chủ quan theo ngữ nghĩa — hãy kiểm tra và chỉnh sửa nội dung dưới đây trước khi gửi.",
+    s2_ai_paths_send: "Gửi cho AI",
+    s2_dummy_btn: "🔢 Tạo biến giả (dummy)",
+    s2_dummy_modal_title: "Tạo biến giả (dummy) từ biến phân loại",
+    s2_dummy_modal_hint: "Mã hoá k−1: một biến có k nhóm sinh ra k−1 cột 0/1, mỗi cột cho một nhóm khác nhóm tham chiếu. Hệ số của mỗi biến giả được hiểu là chênh lệch so với nhóm tham chiếu. Các cột mới được thêm vào dữ liệu và dùng được như chỉ báo bình thường — làm biến độc lập hoặc biến kiểm soát (control variable).",
+    s2_dummy_column_label: "Biến phân loại",
+    s2_dummy_levels_suffix: "nhóm",
+    s2_dummy_reference_label: "Chọn nhóm tham chiếu (reference)",
+    s2_dummy_th_reference: "Tham chiếu",
+    s2_dummy_th_level: "Giá trị",
+    s2_dummy_th_count: "Số quan sát",
+    s2_dummy_th_new_column: "Cột biến giả mới",
+    s2_dummy_reference_baseline: "(nhóm tham chiếu — không tạo cột)",
+    s2_dummy_missing_hint: "Có {n} quan sát thiếu giá trị ở biến này — các biến giả cũng sẽ để trống ở những dòng đó.",
+    s2_dummy_add_constructs: "Tự động thêm một construct đơn chỉ báo cho mỗi biến giả vào mô hình",
+    s2_dummy_create: "Tạo biến giả",
+    s2_dummy_no_candidates: "Không có biến phân loại phù hợp (cần một cột có từ 2 đến 12 giá trị khác nhau).",
+    s2_dummy_success: "Đã tạo biến giả: {columns} (nhóm tham chiếu: {reference}). Nối đường dẫn từ các construct này tới biến phụ thuộc để dùng làm biến độc lập hoặc biến kiểm soát.",
+    s2_qual_score_btn: "🤖 Chấm điểm câu hỏi mở",
+    s2_qual_score_modal_title: "Chấm điểm câu hỏi mở (qualitative) bằng AI",
+    s2_qual_score_modal_hint: "AI sẽ đọc câu trả lời mở của từng người và chấm điểm theo tiêu chí bạn nhập bên dưới, tạo ra một biến quan sát (indicator) Likert mới để dùng trong mô hình. Chỉ áp dụng cho dữ liệu do AI Lab/AI Lab Experiment sinh ra.",
+    s2_qual_score_column_label: "Cột câu hỏi mở cần chấm điểm",
+    s2_qual_score_rubric_label: "Tiêu chí chấm điểm (rubric)",
+    s2_qual_score_rubric_placeholder: "VD: Chấm điểm mức độ hài lòng thể hiện trong câu trả lời, từ 1 (rất không hài lòng) đến 5 (rất hài lòng)...",
+    s2_qual_score_new_column_label: "Tên biến quan sát mới",
+    s2_qual_score_run: "▶ Chạy chấm điểm",
+    s2_qual_score_missing_rubric: "Vui lòng nhập tiêu chí chấm điểm.",
+    s2_qual_score_missing_new_column: "Vui lòng đặt tên cho biến quan sát mới.",
+    s2_qual_score_success: "Đã thêm biến quan sát mới \"{column}\" — có thể dùng ngay trong mô hình.",
+    s2_export_csv_btn: "⬇ Xuất CSV dữ liệu",
+    s2_export_excel_btn: "⬇ Xuất Excel đầy đủ",
+    footer_clear_session: "🗑 Xóa session",
+    footer_clear_session_confirm: "Xóa toàn bộ session đã lưu (dữ liệu, mô hình, kết quả, tiến trình AI Lab chưa hoàn tất) và bắt đầu lại từ đầu? Hành động này không thể hoàn tác.",
+    s2_ai_draw_paths_skip_shortcut: "⏭ Bỏ qua, sang bước tạo mô hình",
+    s2_run_no_data_hint: "Cần có dữ liệu (tải lên hoặc do AI sinh) trước khi chạy phân tích.",
+    s2_ai_paths_save_all: "💾 Lưu toàn bộ đề xuất",
+    s2_ai_moderator_suggestions_label: "Construct AI đề xuất có thể là biến điều tiết (moderator)",
+    s2_ai_moderator_suggestions_hint: "Sau khi chuyển, construct đó sẽ tạm gán 2 nguồn tương tác đầu tiên có thể chọn — mở panel bên phải để đổi lại nếu AI chọn chưa đúng cặp.",
+    s2_ai_moderator_convert_btn: "Chuyển sang Interaction",
+    s2_ai_moderator_converted: "✓ Đã chuyển",
+    s2_ai_moderator_pick_sources_hint: "Tạm gán nguồn: {a} × {b} — mở construct này trên sơ đồ để đổi lại nếu chưa đúng.",
+    s2_ai_rationale_title: "📖 Giải thích mô hình (AI)",
+    s2_ai_rationale_hint: "Do AI tạo ra — vui lòng kiểm chứng trước khi dùng chính thức.",
+    s2_delete_selected: "🗑 Xoá mục chọn",
+    s2_export_model: "⬇ Xuất mô hình",
+    s2_import_model: "⬆ Nhập mô hình",
+    s2_toolbar_hint_default: 'Nhấp đúp vào canvas hoặc bấm "+ Construct" để thêm biến tiềm ẩn.',
+    s2_toolbar_hint_path_mode: "Nhấp vào construct nguồn rồi construct đích để tạo đường dẫn cấu trúc.",
+
+    // --- step 2: side panel ---
+    s2_method_title: "Phương pháp ước lượng",
+    s2_method_pls: "PLS-SEM (Partial Least Squares)",
+    s2_method_cbsem: "CB-SEM (Maximum Likelihood / Covariance-Based)",
+    s2_method_hint_pls: "Composite-based, phù hợp dữ liệu không chuẩn/cỡ mẫu nhỏ, hỗ trợ construct formative.",
+    s2_method_hint_cbsem: "Covariance-based (Maximum Likelihood): cho các chỉ số fit mô hình (CFI, RMSEA, SRMR...) và kiểm định ý nghĩa thống kê trực tiếp, nhưng chỉ hỗ trợ construct reflective.",
+    s2_construct_props: "Thuộc tính Construct",
+    s2_no_selection: "Chọn một construct trên canvas để chỉnh sửa.",
+    s2_construct_name: "Tên construct",
+    s2_measurement_type: "Loại đo lường",
+    s2_mode_reflective: "Reflective (Mode A)",
+    s2_mode_formative: "Formative (Mode B)",
+    s2_mode_interaction: "Biến tương tác / điều tiết (Interaction, A × B, tuỳ chọn thêm C)",
+    s2_indicators_label: "Biến quan sát (indicators)",
+    s2_interaction_sources_label: "Nguồn của biến tương tác (chọn 2 hoặc 3 construct)",
+    s2_interaction_source_a: "Construct A",
+    s2_interaction_source_b: "Construct B",
+    s2_interaction_source_c: "Construct C (tuỳ chọn — tương tác 3 chiều)",
+    s2_interaction_source_c_none: "— không chọn —",
+    s2_interaction_not_enough: "Cần ít nhất 2 construct khác (không phải biến tương tác) đã tồn tại để tạo biến tương tác.",
+    s2_interaction_same_source: "Các construct nguồn phải khác nhau.",
+    s2_interaction_three_way_two_stage_note: "Tương tác 3 chiều chỉ hỗ trợ phương pháp Two Stage.",
+    s2_moderator_attach_rejected: "Không thể gắn construct này làm biến điều tiết ở vị trí này (đã đủ 3 chiều, hoặc construct này là biến tương tác).",
+    s2_calc_method_label: "Phương pháp tính (Calculation Method)",
+    s2_calc_method_product_indicator: "Product Indicator",
+    s2_calc_method_two_stage: "Two Stage",
+    s2_calc_method_orthogonalization: "Orthogonalization",
+    s2_calc_method_cbsem_note: "Lưu ý: CB-SEM luôn dùng Two Stage, bất kể lựa chọn ở đây (Product Indicator/Orthogonalization chỉ áp dụng cho PLS-SEM).",
+    s2_product_term_label: "Sinh Product Term (Advanced Settings)",
+    s2_product_term_unstandardized: "Unstandardized",
+    s2_product_term_mean_centered: "Mean Centered",
+    s2_product_term_standardized: "Standardized",
+    s2_product_term_two_stage_note: "Two Stage luôn nhân hai factor score giai đoạn 1 — vốn đã chuẩn hóa (standardized) sẵn theo định nghĩa (Henseler & Chin, 2010), nên không có lựa chọn nào khác ở đây để chọn thêm.",
+    s2_model_overview: "Tổng quan mô hình",
+    s2_bootstrapping: "Bootstrapping",
+    s2_bootstrap_enable: "Kiểm định ý nghĩa thống kê (t-values, p-values)",
+    s2_bootstrap_reps_label: "Số lần lặp lại mẫu (resamples)",
+    s2_bootstrap_100: "100 (nhanh)",
+    s2_bootstrap_500: "500 (khuyến nghị)",
+    s2_bootstrap_1000: "1000",
+    s2_bootstrap_2000: "2000",
+    s2_bootstrap_5000: "5000 (chậm, ~30-60s)",
+    s2_bootstrap_hint: "Bootstrapping tạo nhiều mẫu lặp lại (resample) từ dữ liệu gốc để ước lượng độ lệch chuẩn, t-value và p-value cho từng path coefficient — cần thiết để báo cáo mức ý nghĩa thống kê (p < 0.05) trong nghiên cứu.",
+    s2_cbsem_note: "CB-SEM tính sẵn SE/z-value/p-value bằng Maximum Likelihood — không cần bootstrapping.",
+    s2_run_pls: "▶ Chạy PLS Algorithm",
+    s2_run_cbsem: "▶ Chạy CB-SEM (ML)",
+
+    // --- construct summary line ---
+    s2_summary_reflective: "Reflective",
+    s2_summary_formative: "Formative",
+    s2_summary_interaction: "Biến tương tác",
+    s2_summary_item_suffix: "item",
+    s2_summary_paths_suffix: "đường dẫn cấu trúc (paths)",
+    s2_summary_toggle_aria: "Hiện/ẩn biến quan sát",
+    s2_path_rejected: "Không thể tạo path này (trùng, ngược chiều, hoặc tạo vòng lặp).",
+
+    // --- add construct modal ---
+    modal_title: "Thêm Construct mới",
+    modal_name_label: "Tên construct",
+    modal_name_placeholder: "VD: Sự hài lòng",
+    modal_mode_label: "Loại đo lường",
+    modal_cancel: "Huỷ",
+    modal_add: "Thêm",
+
+    // --- model import/export ---
+    s2_import_missing_arrays: "File JSON thiếu mảng 'constructs' hoặc 'paths'.",
+    s2_import_missing_fields: "Một construct trong file thiếu id/name/mode/indicators.",
+    s2_import_failed: "Không nhập được mô hình: {msg}",
+
+    // --- step 3: results (shared header) ---
+    s3_path_diagram_title: "Sơ đồ đường dẫn kết quả (Path Diagram)",
+    s3_path_diagram_title_cbsem: "Sơ đồ đường dẫn kết quả (Path Diagram) — CB-SEM",
+    s3_dashed_hint: "Đường nét đứt = path không có ý nghĩa thống kê (p ≥ 0.05) theo kết quả Bootstrapping.",
+    s3_dashed_hint_cbsem: "Hệ số hiển thị là standardized (β); đường nét đứt = không có ý nghĩa thống kê (p ≥ 0.05).",
+    s3_export_excel: "📊 Xuất Excel",
+    s3_export_word: "📄 Xuất Word",
+    s3_sensitivity_btn: "📉 Phân tích độ nhạy cỡ mẫu",
+    s3_power_btn: "⚡ Power Analysis",
+    s3_ml_compare_btn: "🤖 So sánh Machine Learning",
+    s3_mga_btn: "🔀 So sánh đa nhóm (PLS-MGA)",
+    s3_plspredict_btn: "🔮 PLSpredict",
+    s3_plspredict_running: "Đang chạy k-fold…",
+    s3_plspredict_title: "PLSpredict — Đánh giá khả năng dự báo ngoài mẫu",
+    s3_plspredict_hint: "So sánh sai số dự báo (k-fold cross-validation) của mô hình PLS với một hồi quy tuyến tính đơn giản (LM) trên cùng dữ liệu — nếu PLS không thắng được LM, mô hình có thể thiếu giá trị dự báo thực tế dù R² trong mẫu cao (Shmueli et al., 2016).",
+    s3_plspredict_verdict_label: "Đánh giá",
+    s3_plspredict_verdict_detail: "k={k}, n={n} quan sát, PLS thắng {wins}/{total} biến quan sát so với hồi quy LM.",
+    lbl_plspredict_high: "Khả năng dự báo cao",
+    lbl_plspredict_medium: "Khả năng dự báo trung bình",
+    lbl_plspredict_low: "Khả năng dự báo thấp",
+    lbl_plspredict_none: "Không có biến để đánh giá",
+    lbl_plspredict_pls_wins: "PLS thắng",
+    lbl_plspredict_lm_wins: "LM thắng",
+    th_plspredict_pls_rmse: "PLS RMSE",
+    th_plspredict_pls_mae: "PLS MAE",
+    th_plspredict_lm_rmse: "LM RMSE",
+    th_plspredict_lm_mae: "LM MAE",
+    th_plspredict_result: "Kết quả",
+    s3_ipma_btn: "🎯 IPMA",
+    s3_ipma_hint: "Trục ngang: Importance (tổng hiệu ứng chuẩn hoá lên biến mục tiêu). Trục dọc: Performance (điểm trung bình quy về thang 0–100 theo dữ liệu quan sát). Đường chấm: giá trị trung bình — chia thành 4 vùng để xác định construct nào đáng ưu tiên cải thiện.",
+    s3_ipma_target_label: "Chọn construct mục tiêu",
+    s3_ipma_title: "IPMA — Mục tiêu: {target}",
+    th_ipma_importance: "Importance (tổng hiệu ứng)",
+    th_ipma_performance: "Performance (0–100)",
+    s3_back_to_model: "← Quay lại chỉnh sửa mô hình",
+    s3_generating_file: "Đang tạo file…",
+    sens_modal_title: "Phân tích độ nhạy theo cỡ mẫu",
+    sens_modal_hint: "Chạy lại mô hình nhiều lần, mỗi lần bỏ ngẫu nhiên thêm N quan sát so với lần trước, đến khi số quan sát còn khoảng 20 — giúp đánh giá cỡ mẫu tối thiểu và độ ổn định của kết quả. Dữ liệu hiện có {n} quan sát.",
+    sens_modal_step_label: "N — số quan sát giảm thêm mỗi bước",
+    sens_modal_run: "Chạy phân tích",
+    sens_modal_invalid_step: "N phải là số nguyên dương.",
+    sens_modal_cbsem_pvalue_note: "CB-SEM tự động có p-value cho từng path ở mỗi bước/lần lặp (từ ước lượng Maximum Likelihood) — không cần chạy thêm gì.",
+    sens_modal_bootstrap_label: "Cũng tính p-value / ý nghĩa thống kê (chạy Bootstrap ở mỗi bước/lần lặp — chậm hơn)",
+    sens_modal_n_boot_label: "Số lần bootstrap mỗi bước/lần lặp",
+    sens_modal_bootstrap_hint: "PLS-SEM không có công thức ý nghĩa thống kê dạng đóng — mỗi bước/lần lặp sẽ chạy thêm một lượt Bootstrap riêng để tính p-value, nên bật tuỳ chọn này sẽ chạy lâu hơn đáng kể so với mặc định.",
+    sens_modal_invalid_n_boot: "Số lần bootstrap phải là số nguyên ≥ 100.",
+    sens_mode_label: "Kiểu phân tích",
+    sens_mode_shrink_label: "Giảm dần cỡ mẫu (từng bước)",
+    sens_mode_resample_label: "Lấy mẫu lặp ở cỡ mẫu cố định",
+    sens_modal_new_n_label: "Cỡ mẫu mới (nhỏ hơn cỡ mẫu hiện tại)",
+    sens_modal_n_iter_label: "Số lần lặp (N)",
+    sens_modal_invalid_new_n: "Cỡ mẫu mới phải là số nguyên, tối thiểu {min} và nhỏ hơn số quan sát hiện tại ({n}).",
+    sens_modal_invalid_n_iter: "Số lần lặp phải là số nguyên từ 20 đến 500.",
+    sens_modal_resample_hint: "Giữ nguyên cỡ mẫu mới, lấy ngẫu nhiên (không lặp lại) và chạy lại mô hình N lần, để xem R² và các hệ số đường dẫn dao động ra sao qua N lần lấy mẫu đó — khác với chế độ giảm dần chỉ lấy mẫu một lần ở mỗi bước.",
+
+    // --- sensitivity.html (opens in a new tab) ---
+    sens_page_title: "Phân tích độ nhạy theo cỡ mẫu",
+    sens_close_tab: "✕ Đóng tab này",
+    sens_loading: "Đang chạy lại mô hình với các cỡ mẫu khác nhau…",
+    sens_no_job: "Không tìm thấy yêu cầu phân tích — hãy mở trang này từ nút \"Phân tích độ nhạy cỡ mẫu\" ở trang kết quả.",
+    sens_failed: "Phân tích độ nhạy thất bại.",
+    sens_summary_title: "Tổng quan",
+    sens_summary_text: "Phương pháp: {method} · Dữ liệu gốc: {n0} quan sát · Giảm N={step} quan sát mỗi bước · {count} bước đã chạy (n từ {minN} đến {n0}) · {conv}/{count} bước hội tụ.",
+    sens_r2_chart_title: "R² theo cỡ mẫu (biến nội sinh)",
+    sens_chart_hint: "Di chuột vào biểu đồ để xem giá trị chính xác tại từng cỡ mẫu. Điểm viền đỏ = mô hình không hội tụ ở cỡ mẫu đó.",
+    sens_path_chart_title: "Hệ số đường dẫn (Path Coefficients) theo cỡ mẫu",
+    sens_pvalue_chart_title: "P-value theo cỡ mẫu",
+    sens_pvalue_chart_hint: "Đường nét đứt đỏ = ngưỡng 0.05. Với PLS-SEM, p-value ở đây đến từ một lượt Bootstrap chạy riêng ở mỗi cỡ mẫu (không phải bootstrap của lần phân tích chính) nên có thể dao động nhẹ giữa các lần chạy khác nhau.",
+    sens_table_title: "Bảng số liệu chi tiết",
+    sens_th_n: "n (quan sát)",
+    sens_th_converged: "Hội tụ",
+    sens_th_export_row: "Dữ liệu gốc",
+    sens_export_row_btn: "⬇ CSV",
+    sens_export_row_hint: "Xuất đúng các dòng dữ liệu gốc (toàn bộ cột) đã được lấy mẫu ngẫu nhiên và dùng để chạy lượt phân tích này, để kiểm chứng lại kết quả.",
+    sens_export_row_failed: "Không thể xuất dữ liệu gốc cho dòng này.",
+    sens_yes: "Có",
+    sens_no: "Không",
+    sens_axis_n: "n",
+    sens_axis_coef: "Hệ số",
+    sens_axis_pvalue: "P-value",
+    sens_axis_median: "Median",
+    sens_not_converged_short: "không hội tụ",
+    sens_th_iteration: "Lần lặp",
+    sens_resample_summary_text: "Phương pháp: {method} · Dữ liệu gốc: {n0} quan sát · Cỡ mẫu mới cố định: {newN} · Số lần lặp: {nIter} · {conv}/{nIter} lần hội tụ.",
+    sens_resample_r2_chart_title: "Phân phối R² qua {n} lần lấy mẫu lại (cỡ mẫu = {newN})",
+    sens_resample_path_chart_title: "Phân phối hệ số đường dẫn qua {n} lần lấy mẫu lại (cỡ mẫu = {newN})",
+    sens_resample_chart_hint: "Mỗi hộp là phân phối của một biến/đường dẫn qua tất cả các lần lặp: đường giữa = median, hộp = khoảng IQR (Q1-Q3), râu = giá trị trong 1.5×IQR, điểm rời = ngoại lai. Di chuột vào từng hộp để xem số liệu chi tiết.",
+    sens_resample_chart_hint_line: "Mỗi đường là một biến/đường dẫn qua các lần lặp (trục hoành = lần lặp). Di chuột vào biểu đồ để xem giá trị chính xác tại từng lần lặp. Điểm viền đỏ = mô hình không hội tụ ở lần lặp đó.",
+    sens_resample_pvalue_chart_title: "Phân phối p-value qua {n} lần lấy mẫu lại (cỡ mẫu = {newN})",
+    sens_resample_pvalue_chart_hint: "Đường nét đứt đỏ = ngưỡng 0.05. Mỗi hộp là phân phối p-value của một đường dẫn qua tất cả các lần lặp (mỗi lần lặp chạy một Bootstrap riêng để tính p-value cho lần đó).",
+    sens_resample_pvalue_chart_hint_line: "Đường nét đứt đỏ = ngưỡng 0.05. Mỗi đường là p-value của một đường dẫn qua các lần lặp (mỗi lần lặp chạy một Bootstrap riêng để tính p-value cho lần đó).",
+    sens_chart_type_box: "📦 Biểu đồ hộp",
+    sens_chart_type_line: "📈 Biểu đồ đường",
+    sens_guide_section_title: "Hướng dẫn đọc & Ý nghĩa các chỉ số",
+    sens_guide_what_summary: "Sample Size Sensitivity là gì?",
+    sens_guide_what_body:
+      "<p>Kiểm tra độ ổn định của các ước lượng (R², path coefficient) khi cỡ mẫu <strong>thật</strong> giảm dần — bằng cách lấy ngẫu nhiên bớt quan sát từ chính dữ liệu bạn đã upload rồi chạy lại mô hình nhiều lần. Trả lời câu hỏi: <strong>\"Nếu tôi có ít dữ liệu hơn, kết quả có còn ổn định/hội tụ không?\"</strong></p>" +
+      "<p>Công cụ này hữu ích để đánh giá độ nhạy của kết quả hiện tại với cỡ mẫu — <strong>không phải</strong> để tính xác suất phát hiện hiệu ứng hay xác định cỡ mẫu cần thu thập trước khi khảo sát (đó là việc của <em>Power Analysis</em>, một công cụ mô phỏng dữ liệu hoàn toàn mới từ mô hình quần thể giả định, khác về bản chất với việc bớt dần dữ liệu thật ở đây).</p>",
+    sens_guide_read_summary: "Cách đọc biểu đồ & bảng số liệu",
+    sens_guide_read_body:
+      "<ul>" +
+      "<li><strong>Trục hoành (n):</strong> cỡ mẫu tại mỗi bước, giảm dần từ tổng số quan sát ban đầu.</li>" +
+      "<li><strong>Biểu đồ R²:</strong> R² của từng biến nội sinh thay đổi thế nào khi cỡ mẫu giảm.</li>" +
+      "<li><strong>Biểu đồ Path Coefficients:</strong> từng hệ số đường dẫn thay đổi ra sao khi cỡ mẫu giảm.</li>" +
+      "<li><strong>Biểu đồ P-value</strong> (nếu bật): p-value của từng path tại mỗi cỡ mẫu, đường nét đứt đỏ ở 0.05. Với CB-SEM luôn có sẵn (miễn phí, lấy trực tiếp từ ước lượng ML); với PLS-SEM chỉ có khi bật tuỳ chọn Bootstrap trong hộp thoại cấu hình, vì cần chạy thêm một lượt bootstrap riêng ở mỗi cỡ mẫu.</li>" +
+      "<li><strong>Điểm viền đỏ:</strong> mô hình không hội tụ ở cỡ mẫu đó — dấu hiệu cỡ mẫu đã quá nhỏ để ước lượng ổn định.</li>" +
+      "<li><strong>Bảng chi tiết:</strong> liệt kê từng cỡ mẫu đã chạy, có hội tụ hay không, cùng R² và path coefficient (và p-value nếu có) tương ứng tại điểm đó.</li>" +
+      "</ul>",
+    sens_guide_limits_summary: "Giới hạn",
+    sens_guide_limits_body:
+      "<ul>" +
+      "<li>Mỗi cỡ mẫu chỉ được lấy mẫu con <strong>một lần</strong> (không lặp lại nhiều lần như mô phỏng Monte Carlo), nên một phần dao động giữa các điểm liền kề đến từ nhiễu ngẫu nhiên của riêng lần lấy mẫu đó, không hẳn phản ánh một xu hướng thật đang diễn ra. Muốn khắc phục đúng điểm này, dùng chế độ \"Lấy mẫu lặp ở cỡ mẫu cố định\" bên dưới.</li>" +
+      "<li>Đây là phân tích trên dữ liệu đã có sẵn — không cho biết cỡ mẫu bạn <strong>nên</strong> thu thập nếu chưa khảo sát; muốn trả lời câu hỏi đó, dùng Power Analysis ở trang kết quả.</li>" +
+      "</ul>",
+    sens_guide_resample_summary: "Chế độ \"Lấy mẫu lặp ở cỡ mẫu cố định\" là gì?",
+    sens_guide_resample_body:
+      "<p>Thay vì giảm dần cỡ mẫu và chỉ lấy mẫu con <strong>một lần</strong> ở mỗi bước, chế độ này giữ <strong>cố định</strong> một cỡ mẫu nhỏ hơn do bạn chọn, rồi lấy ngẫu nhiên (không lặp lại) và chạy lại mô hình <strong>nhiều lần</strong> (N lần) ở đúng cỡ mẫu đó — một kiểu mô phỏng Monte Carlo thật sự trên chính dữ liệu của bạn.</p>" +
+      "<p>Kết quả là một biểu đồ hộp (box plot) cho R² và từng hệ số đường dẫn, cho thấy các ước lượng đó dao động (median, khoảng IQR, min-max, và các điểm ngoại lai) ra sao qua N lần lấy mẫu — trả lời câu hỏi <strong>\"Nếu tôi chỉ có cỡ mẫu đó, ước lượng của tôi ổn định đến mức nào?\"</strong> chính xác hơn một điểm đơn lẻ.</p>",
+
+    // --- power_analysis.html (opens in a new tab) ---
+    power_page_title: "Phân tích lũy thừa thống kê (Power Analysis)",
+    power_loading: "Đang mô phỏng Monte Carlo — có thể mất một lúc…",
+    power_no_job: "Không tìm thấy yêu cầu phân tích — hãy mở trang này từ nút \"Power Analysis\" ở trang kết quả.",
+    power_failed: "Power Analysis thất bại.",
+    power_summary_title: "Tổng quan",
+    power_method_hint: "Mỗi điểm mô phỏng: sinh dữ liệu tổng hợp từ mô hình quần thể đã khai báo (path coefficient & loading kỳ vọng), chạy PLS-SEM + Bootstrap, rồi tính tỉ lệ số lần path có ý nghĩa thống kê (p < 0.05) trên tổng số lần lặp hội tụ. Giả định các construct ngoại sinh độc lập nhau (Aguirre-Urreta & Rönkkö, 2015).",
+    power_summary_text_pls: "{nPaths} đường dẫn · {nSizes} cỡ mẫu được kiểm tra · {nMc} lần lặp Monte Carlo/cỡ mẫu · {nBoot} lần bootstrap/lần lặp · Cỡ mẫu tối thiểu đạt lũy thừa 80%: {minN}.",
+    power_summary_text_cbsem: "{nPaths} đường dẫn · {nSizes} cỡ mẫu được kiểm tra · {nMc} lần lặp Monte Carlo/cỡ mẫu · ý nghĩa thống kê tính trực tiếp (z-test, không cần bootstrap) · Cỡ mẫu tối thiểu đạt lũy thừa 80%: {minN}.",
+    power_chart_title: "Đường cong lũy thừa (Power) theo cỡ mẫu",
+    power_chart_hint: "Di chuột vào biểu đồ để xem giá trị chính xác. Đường nét đứt ngang = ngưỡng 80% (quy ước thông thường). Bấm vào chú thích để ẩn/hiện từng đường.",
+    power_table_title: "Bảng số liệu chi tiết",
+    power_not_reached: "chưa đạt",
+    power_axis_n: "n",
+    power_axis_power: "Power (%)",
+    power_th_n: "n (quan sát)",
+    power_th_path: "Đường dẫn",
+    power_th_power: "Power",
+    power_th_converged: "Hội tụ / Tổng lần lặp",
+    power_th_mean_estimate: "Hệ số ước lượng TB",
+    power_modal_title: "Cấu hình Power Analysis",
+    power_modal_hint: "Khai báo path coefficient và loading kỳ vọng (mô hình quần thể), rồi chọn khoảng cỡ mẫu cần kiểm tra. Mặc định lấy từ kết quả phân tích gần nhất (có thể chỉnh sửa).",
+    power_modal_paths_title: "Path coefficient kỳ vọng",
+    power_modal_loadings_title: "Loading kỳ vọng (trung bình mỗi construct)",
+    power_modal_range_title: "Khoảng cỡ mẫu",
+    power_modal_from: "Từ",
+    power_modal_to: "Đến",
+    power_modal_step: "Bước nhảy",
+    power_modal_advanced: "Tùy chọn nâng cao",
+    power_modal_n_mc: "Số lần lặp Monte Carlo / cỡ mẫu",
+    power_modal_n_boot: "Số lần bootstrap / lần lặp",
+    power_modal_n_mc_hint: "Cao hơn = đường cong mượt hơn nhưng chạy lâu hơn.",
+    power_modal_estimate: "Ước tính thời gian chạy: ~{sec} giây ({points} cỡ mẫu × {mc} lần lặp).",
+    power_modal_run: "Chạy mô phỏng",
+    power_modal_invalid: "Vui lòng kiểm tra lại các giá trị đã nhập (số dương, khoảng cỡ mẫu hợp lệ).",
+    power_btn_disabled_hint: "Power Analysis chỉ hỗ trợ mô hình reflective (Mode A), không có biến điều tiết.",
+    power_guide_section_title: "Hướng dẫn đọc & Ý nghĩa các chỉ số",
+    power_guide_what_summary: "Power Analysis là gì và khi nào nên dùng?",
+    power_guide_what_body:
+      "<p>Power Analysis (dưới giả thuyết H₁) trả lời câu hỏi: <strong>\"Nếu hiệu ứng thật trong quần thể đúng bằng giá trị tôi kỳ vọng, thì với cỡ mẫu n, xác suất tôi phát hiện được hiệu ứng đó là bao nhiêu?\"</strong> Đây là công cụ dùng <strong>trước khi</strong> thu thập dữ liệu, để ước tính cỡ mẫu tối thiểu cần khảo sát — khác với hầu hết phân tích PLS-SEM khác vốn chỉ áp dụng sau khi đã có dữ liệu thật.</p>" +
+      "<p>Vì PLS-SEM không có công thức power dạng đóng (closed-form), công cụ này dùng mô phỏng Monte Carlo: sinh nhiều bộ dữ liệu giả lập từ mô hình quần thể bạn khai báo, chạy PLS-SEM + Bootstrap thật trên từng bộ, rồi đếm tỉ lệ phát hiện được hiệu ứng.</p>" +
+      "<p>Trang này dùng chung cho cả PLS-SEM và CB-SEM. Với <strong>CB-SEM</strong>, ý nghĩa thống kê được tính trực tiếp bằng z-test (Wald test) từ ước lượng Maximum Likelihood — không cần bootstrap — nên mỗi lần lặp chỉ cần một lượt fit, nhanh hơn nhiều so với PLS-SEM (vốn cần thêm một vòng bootstrap bên trong mỗi lần lặp).</p>" +
+      "<p><strong>Khác với Sample Size Sensitivity:</strong> Sensitivity lấy lại dữ liệu thật đã thu thập và bỏ bớt quan sát dần — trả lời \"kết quả hiện tại ổn định đến đâu nếu tôi có ít dữ liệu hơn\". Power Analysis mô phỏng dữ liệu hoàn toàn mới từ một mô hình quần thể giả định — trả lời \"tôi cần thu thập bao nhiêu mẫu\". Hai công cụ bổ trợ nhau, không thay thế nhau.</p>",
+    power_guide_read_summary: "Cách đọc biểu đồ & bảng số liệu",
+    power_guide_read_body:
+      "<ul>" +
+      "<li><strong>Trục hoành (n):</strong> cỡ mẫu được kiểm tra.</li>" +
+      "<li><strong>Trục tung (Power %):</strong> tỉ lệ % số lần mô phỏng mà path đó có ý nghĩa thống kê (p &lt; 0.05), trên tổng số lần PLS hội tụ ở cỡ mẫu đó.</li>" +
+      "<li><strong>Đường nét đứt ngang ở 80%:</strong> ngưỡng quy ước (Cohen, 1988) coi là \"đủ mạnh\" — cỡ mẫu nơi đường cong của một path vượt qua ngưỡng này là gợi ý cỡ mẫu tối thiểu nên thu thập cho path đó.</li>" +
+      "<li>Mỗi đường trong biểu đồ ứng với 1 đường dẫn cấu trúc — bấm vào chú thích (legend) để ẩn/hiện từng đường.</li>" +
+      "<li><strong>Cột \"Hội tụ / Tổng lần lặp\":</strong> số lần PLS hội tụ trên tổng số lần mô phỏng ở cỡ mẫu đó. Tỉ lệ hội tụ thấp bất thường (thường ở n rất nhỏ) nghĩa là power ước lượng tại điểm đó kém tin cậy hơn.</li>" +
+      "<li><strong>Cột \"Hệ số ước lượng TB\":</strong> trung bình path coefficient ước lượng được qua các lần mô phỏng hội tụ — nên gần với giá trị bạn khai báo làm quần thể; nếu lệch đáng kể, có thể do PLS có xu hướng làm suy giảm (attenuate) hệ số path khi số indicator/block ít.</li>" +
+      "</ul>",
+    power_guide_limits_summary: "Giả định & giới hạn",
+    power_guide_limits_body:
+      "<ul>" +
+      "<li>Chỉ hỗ trợ construct reflective (Mode A); chưa hỗ trợ formative (Mode B) hoặc mô hình có biến điều tiết (moderation/interaction).</li>" +
+      "<li>Giả định các construct ngoại sinh độc lập với nhau (Aguirre-Urreta & Rönkkö, 2015) — nếu quần thể thật có tương quan mạnh giữa các biến ngoại sinh, kết quả có thể lệch.</li>" +
+      "<li>Mỗi construct dùng một giá trị loading trung bình áp cho tất cả indicator của nó, thay vì khai báo riêng từng indicator.</li>" +
+      "<li>Kết quả phụ thuộc hoàn toàn vào giá trị path coefficient/loading kỳ vọng bạn khai báo — đây là mô phỏng dựa trên giả định của bạn, không phải \"sự thật\". Nên thử vài kịch bản khác nhau (lạc quan/thận trọng) để có bức tranh đầy đủ hơn.</li>" +
+      "<li>Số lần lặp Monte Carlo càng thấp, đường cong càng nhiễu (dao động ngẫu nhiên do lấy mẫu) — tăng lên nếu cần đường cong mượt hơn, đổi lại thời gian chạy lâu hơn.</li>" +
+      "</ul>",
+
+    // --- ML comparison page ---
+    ml_page_title: "So sánh Machine Learning",
+    ml_loading: "Đang huấn luyện các thuật toán Machine Learning — có thể mất một lúc…",
+    ml_no_job: "Không tìm thấy yêu cầu phân tích — hãy mở trang này từ nút \"So sánh Machine Learning\" ở trang kết quả.",
+    ml_failed: "So sánh Machine Learning thất bại.",
+    ml_summary_title: "Tổng quan",
+    ml_summary_text: "{method} · {nTargets} construct nội sinh · {nAlgos} thuật toán đã chọn · k-fold cross-validation với k={k}.",
+    ml_method_hint: "Với mỗi construct nội sinh (có ít nhất 1 đường dẫn đi vào), các construct tiền đề trực tiếp của nó (đúng như trong mô hình cấu trúc) được dùng làm biến đầu vào để huấn luyện từng thuật toán đã chọn, đánh giá bằng k-fold cross-validation. Feature importance hiển thị ở phần so sánh là permutation importance — cách đo duy nhất có thể so sánh công bằng giữa hệ số hồi quy tuyến tính, mức độ phân tách của cây quyết định, và biên độ của SVM.",
+    ml_comparison_title: "So sánh: Hệ số đường dẫn SEM vs. Feature Importance (ML)",
+    ml_comparison_hint: "Mỗi dòng là một cặp (biến mục tiêu, biến tiền đề) — bảng phẳng, không gộp ô. Cột \"SEM\" là hệ số đường dẫn chuẩn hóa từ mô hình cấu trúc; các cột thuật toán là permutation importance. Xem biểu đồ minh họa cùng số liệu ở mục bên dưới.",
+    ml_charts_title: "Biểu đồ so sánh theo từng biến mục tiêu",
+    ml_charts_hint: "Mỗi biểu đồ ứng với một construct nội sinh (biến mục tiêu), chuẩn hóa 0–1 trong phạm vi biến đó để so sánh các thuật toán dễ dàng hơn. Bấm vào tên trong chú thích để ẩn/hiện thuật toán đó trên tất cả biểu đồ.",
+    ml_detail_title: "Chi tiết từng thuật toán",
+    ml_detail_hint: "Chỉ số phù hợp (R²/RMSE cho hồi quy, Accuracy/AUC cho Logistic Regression) và bảng xếp hạng importance đầy đủ — gồm cả importance \"gốc\" của thuật toán (hệ số hồi quy hoặc feature_importances_) lẫn permutation importance.",
+    ml_th_predictor: "Biến tiền đề",
+    ml_th_sem_coef: "SEM (path coef.)",
+    ml_th_target: "Biến mục tiêu",
+    ml_th_accuracy: "Accuracy",
+    ml_th_auc: "AUC",
+    ml_th_native_importance: "Importance gốc",
+    ml_th_permutation_importance: "Permutation Importance",
+    ml_tooltip_normalized: "đã chuẩn hóa",
+    ml_badge_regression: "Hồi quy",
+    ml_badge_classification: "Phân loại",
+    ml_algo_linreg: "Hồi quy tuyến tính (Linear Regression)",
+    ml_algo_logreg: "Hồi quy Logistic (Logistic Regression)",
+    ml_algo_dtree: "Cây quyết định (Decision Tree)",
+    ml_algo_rf: "Random Forest",
+    ml_algo_svm: "Support Vector Machine (SVM)",
+    ml_algo_gbm: "Gradient Boosting (GBM)",
+    ml_algo_xgboost: "XGBoost",
+    ml_algo_lightgbm: "LightGBM",
+    ml_algo_catboost: "CatBoost",
+    ml_guide_section_title: "Hướng dẫn đọc & Ý nghĩa các chỉ số",
+    ml_guide_what_summary: "So sánh Machine Learning là gì?",
+    ml_guide_what_body:
+      "<p>Công cụ này chạy lại đúng bộ dữ liệu bạn đã dùng cho SEM, nhưng thay vì mô hình cấu trúc (path model), mỗi construct nội sinh được dự báo bằng các thuật toán Machine Learning — từ hồi quy tuyến tính/logistic đơn giản đến các mô hình cây và boosting (Random Forest, GBM, XGBoost, LightGBM, CatBoost). Mục tiêu là kiểm tra chéo: các biến tiền đề mà mô hình SEM cho là quan trọng (hệ số đường dẫn lớn) có thực sự là những biến \"quan trọng nhất\" theo góc nhìn dữ liệu-hướng (data-driven) của Machine Learning hay không.</p>" +
+      "<p><strong>Đây không phải là kiểm định thống kê thay thế SEM</strong> — SEM ước lượng một mô hình lý thuyết đã khai báo trước (confirmatory), trong khi Machine Learning ở đây chỉ tối ưu khả năng dự báo (predictive), không kiểm định giả thuyết. Sự đồng thuận giữa hai cách tiếp cận củng cố thêm độ tin cậy của phát hiện; sự khác biệt là gợi ý để xem xét thêm, không phải bằng chứng SEM \"sai\".</p>",
+    ml_guide_logreg_summary: "Vì sao Logistic Regression lại có Accuracy/AUC thay vì R²?",
+    ml_guide_logreg_body:
+      "<p>Điểm số construct (construct score) trong SEM là biến liên tục, trong khi Logistic Regression là một thuật toán phân loại (classification) — nó chỉ dự báo được nhãn 0/1, không dự báo được một giá trị liên tục. Vì vậy biến mục tiêu (y) được chuyển thành 0/1 theo đúng quy tắc sau, thực hiện <strong>riêng cho từng fold của k-fold cross-validation</strong>:</p>" +
+      "<ol>" +
+      "<li>Tính trung vị (median) của y <strong>chỉ trên tập huấn luyện (training fold)</strong> của fold đó — không dùng tập kiểm tra (test fold), để tránh rò rỉ dữ liệu (data leakage).</li>" +
+      "<li>Với mỗi quan sát (ở cả tập huấn luyện lẫn tập kiểm tra): <code>y_nhị_phân = 1</code> nếu <code>y &gt; median_tập_huấn_luyện</code> (nhóm \"Cao\"), ngược lại <code>y_nhị_phân = 0</code> (nhóm \"Thấp\").</li>" +
+      "<li>Logistic Regression được huấn luyện và đánh giá trên <code>y_nhị_phân</code> này, không phải trên điểm số liên tục gốc.</li>" +
+      "</ol>" +
+      "<p>Vì ngưỡng median được tính lại trên từng fold, giá trị ngưỡng cụ thể có thể khác nhau đôi chút giữa các fold — đây là điều bình thường của k-fold cross-validation, không phải lỗi. Vì bài toán đã đổi từ hồi quy sang phân loại, chỉ số đánh giá cũng đổi theo: Accuracy (tỉ lệ dự báo đúng nhóm) và AUC (khả năng phân biệt hai nhóm 0/1), thay vì R²/RMSE như các thuật toán hồi quy còn lại.</p>",
+    ml_logreg_inline_note: "Biến mục tiêu đã được chuyển thành 0/1: y = 1 (\"Cao\") nếu lớn hơn trung vị của tập huấn luyện trong fold đó, ngược lại y = 0 (\"Thấp\"). Xem mục \"Vì sao Logistic Regression lại có Accuracy/AUC thay vì R²?\" ở phần hướng dẫn bên dưới để biết chi tiết.",
+    ml_guide_limits_summary: "Giới hạn",
+    ml_guide_limits_body:
+      "<ul>" +
+      "<li>Biến đầu vào là điểm số construct (construct score/factor score), không phải các indicator gốc — nên \"feature importance\" ở đây là ở cấp construct, tương ứng trực tiếp với hệ số đường dẫn SEM, chứ không phải importance của từng câu hỏi/item khảo sát.</li>" +
+      "<li>Với cỡ mẫu nhỏ, các thuật toán phức tạp (Random Forest, boosting) dễ overfit hơn hồi quy tuyến tính — R² âm ở tập kiểm tra (test fold) là dấu hiệu bình thường khi dữ liệu ít, không hẳn là lỗi.</li>" +
+      "<li>SVM không có importance \"gốc\" (native) vì kernel mặc định không tuyến tính — chỉ hiển thị được permutation importance.</li>" +
+      "<li>Ngưỡng chia đôi (median split) của Logistic Regression làm mất thông tin so với biến liên tục gốc — chỉ nên xem đây là một góc nhìn bổ sung, không thay thế phân tích hồi quy đầy đủ.</li>" +
+      "</ul>",
+    ml_modal_title: "Cấu hình So sánh Machine Learning",
+    ml_modal_loading_algorithms: "Đang tải danh sách thuật toán khả dụng…",
+    ml_modal_load_failed: "Không tải được danh sách thuật toán. Vui lòng thử lại.",
+    ml_modal_hint: "Chọn các thuật toán muốn chạy — mỗi thuật toán được đánh giá bằng k-fold cross-validation trên cùng dữ liệu đã dùng cho SEM.",
+    ml_group_linear: "Hồi quy tuyến tính / logistic",
+    ml_group_tree: "Cây quyết định & Ensemble",
+    ml_group_boosting: "Gradient Boosting",
+    ml_modal_unavailable: "chưa khả dụng",
+    ml_modal_unavailable_hint: "Thư viện của thuật toán này chưa được cài trên máy chủ.",
+    ml_modal_k_label: "Số fold (k) cho cross-validation",
+    ml_modal_k_hint: "Cao hơn = ước lượng ổn định hơn nhưng chạy lâu hơn, đặc biệt với Random Forest/CatBoost.",
+    ml_modal_select_at_least_one: "Vui lòng chọn ít nhất một thuật toán.",
+    ml_modal_invalid_k: "Số fold (k) phải từ 2 đến 10.",
+
+    mga_modal_title: "Cấu hình So sánh đa nhóm (PLS-MGA)",
+    mga_modal_loading: "Đang tìm biến có thể dùng để phân nhóm…",
+    mga_modal_no_candidates: "Không tìm thấy cột nào phù hợp để phân nhóm (cần một cột có 2-15 giá trị khác nhau, không phải biến quan sát trong mô hình).",
+    mga_modal_hint: "Chọn một biến để chia đáp viên thành 2 nhóm, rồi chọn giá trị nào thuộc nhóm nào. So sánh path coefficient giữa 2 nhóm bằng 3 phương pháp: Parametric/Welch-Satterthwaite, Permutation test, và PLS-MGA (Henseler).",
+    mga_modal_column_label: "Biến phân nhóm",
+    mga_modal_group_a_title: "Nhóm A",
+    mga_modal_group_b_title: "Nhóm B",
+    mga_modal_label_placeholder_a: "Tên hiển thị cho Nhóm A (tuỳ chọn)",
+    mga_modal_label_placeholder_b: "Tên hiển thị cho Nhóm B (tuỳ chọn)",
+    mga_modal_value_used_by_other_group: "Giá trị này đã thuộc nhóm khác.",
+    mga_modal_n_boot_label: "Số lần bootstrap mỗi nhóm",
+    mga_modal_n_perm_label: "Số lần permutation",
+    mga_modal_settings_hint: "Từ 100 đến 5000. Số lớn hơn cho kết quả ổn định hơn nhưng chạy lâu hơn.",
+    mga_modal_select_values: "Vui lòng chọn ít nhất một giá trị cho mỗi nhóm.",
+    mga_modal_invalid_settings: "Số lần bootstrap/permutation phải từ 100 đến 5000.",
+
+    mga_page_title: "So sánh đa nhóm (PLS-MGA)",
+    mga_loading: "Đang chạy bootstrap và permutation cho từng nhóm — có thể mất một lúc…",
+    mga_no_job: "Không tìm thấy yêu cầu so sánh đa nhóm — hãy mở lại từ trang kết quả.",
+    mga_failed: "So sánh đa nhóm thất bại.",
+    mga_summary_title: "Tổng quan",
+    mga_summary_text: "Phân nhóm theo biến \"{column}\": {labelA} (n={nA}) vs. {labelB} (n={nB}). Bootstrap: {nBoot} lần/nhóm, Permutation: {nPerm} lần.",
+    mga_table_title: "So sánh hệ số đường dẫn giữa 2 nhóm",
+    mga_table_hint: "Mỗi dòng là một đường dẫn (path) trong mô hình cấu trúc. Cột p-value nhỏ (< 0.05) ở Parametric/Welch-Satterthwaite/Permutation, hoặc p-MGA < 0.05 hay > 0.95, cho biết hệ số đường dẫn khác biệt có ý nghĩa giữa {labelA} và {labelB}.",
+    mga_col_path: "Đường dẫn",
+    mga_col_coef_a: "Hệ số",
+    mga_col_coef_b: "Hệ số",
+    mga_col_diff: "Chênh lệch",
+    mga_col_p_parametric: "p (Parametric)",
+    mga_col_p_welch: "p (Welch-Satterthwaite)",
+    mga_col_p_permutation: "p (Permutation)",
+    mga_col_p_mga: "p (PLS-MGA)",
+    mga_col_significant: "Kết luận",
+    mga_significant: "Khác biệt có ý nghĩa",
+    mga_not_significant: "Không khác biệt có ý nghĩa",
+    mga_guide_section_title: "Hướng dẫn đọc & Ý nghĩa các chỉ số",
+    mga_guide_what_summary: "PLS-MGA (Multi-Group Analysis) là gì?",
+    mga_guide_what_body:
+      "<p>So sánh xem một đường dẫn (path) trong mô hình cấu trúc có hệ số khác nhau có ý nghĩa thống kê giữa hai nhóm đáp viên hay không (ví dụ: Nam vs. Nữ, nhóm điều kiện A vs. B). Đây là bước phân tích riêng, chạy SAU khi mô hình đã được ước lượng ở Bước 3 — dùng đúng cùng bộ dữ liệu và mô hình.</p>",
+    mga_guide_methods_summary: "Ý nghĩa 3 phương pháp kiểm định",
+    mga_guide_methods_body:
+      "<ul>" +
+      "<li><strong>Parametric test (Chin, 2000)</strong> và <strong>Welch-Satterthwaite</strong>: kiểm định t cổ điển, dựa trên độ lệch chuẩn bootstrap của từng nhóm. Parametric giả định hai nhóm có phương sai bằng nhau; Welch-Satterthwaite không cần giả định này (thường đáng tin hơn khi cỡ mẫu hai nhóm khác biệt).</li>" +
+      "<li><strong>Permutation test (Chin &amp; Dibbern, 2010)</strong>: phi tham số — trộn ngẫu nhiên toàn bộ đáp viên rồi chia lại thành 2 nhóm có cùng cỡ mẫu ban đầu, lặp lại nhiều lần để tạo phân phối \"không có khác biệt thật\", từ đó tính p-value.</li>" +
+      "<li><strong>PLS-MGA (Henseler, Ringle &amp; Sinkovics, 2009)</strong>: phi tham số — so sánh trực tiếp toàn bộ phân phối bootstrap của hệ số đường dẫn giữa 2 nhóm (không quy về sai số chuẩn trước). Có ý nghĩa ở mức 5% khi p &lt; 0.05 HOẶC p &gt; 0.95 (ngưỡng bất đối xứng này là quy ước chuẩn của phương pháp, không phải p &lt; 0.025).</li>" +
+      "</ul>" +
+      "<p>Các phương pháp thường cho kết luận tương tự nhau; nếu không, nên báo cáo cả 3 và ưu tiên Welch-Satterthwaite hoặc PLS-MGA làm kết quả chính (ít giả định hơn).</p>",
+    mga_guide_limits_summary: "Giới hạn",
+    mga_guide_limits_body:
+      "<ul>" +
+      "<li>Mô hình có biến tương tác/điều tiết (interaction/moderation) chỉ được hỗ trợ nếu dùng phương pháp Two-Stage — không hỗ trợ Product Indicator hoặc Orthogonalization.</li>" +
+      "<li>Cần tối thiểu 30 quan sát hợp lệ ở MỖI nhóm để kết quả bootstrap/permutation đủ ổn định.</li>" +
+      "<li>Kết quả chỉ so sánh được ĐÚNG 2 nhóm mỗi lần chạy — với biến phân nhóm có nhiều hơn 2 giá trị, hãy gộp các giá trị còn lại vào 1 trong 2 nhóm, hoặc chạy lại nhiều lần cho từng cặp nhóm muốn so sánh.</li>" +
+      "</ul>",
+
+    // --- AI report (shared modal + standalone page) ---
+    s3_ai_report_btn: "🤖 Báo cáo AI",
+    ai_modal_title: "Sinh báo cáo bằng AI",
+    ai_modal_provider_label: "Nhà cung cấp AI",
+    ai_modal_api_key_label: "API key của bạn",
+    ai_modal_api_key_hint: "Key được gửi tới máy chủ đang chạy app này để chuyển tiếp yêu cầu tới {provider} cho đúng 1 lần gọi này — không được lưu trữ hay ghi log ở phía máy chủ.",
+    ai_modal_remember_key: "Ghi nhớ key này trên trình duyệt này (localStorage)",
+    ai_modal_storage_error: "Không thể lưu yêu cầu (có thể do biểu đồ đính kèm quá lớn) — vui lòng thử lại.",
+    ai_modal_model_label: "Model",
+    ai_modal_model_hint: "Đây là danh sách gợi ý, không giới hạn — bạn có thể gõ bất kỳ tên model nào mà tài khoản của bạn được phép dùng.",
+    ai_modal_temperature_label: "Độ sáng tạo (temperature)",
+    ai_modal_temperature_low: "Chính xác",
+    ai_modal_temperature_high: "Sáng tạo",
+    ai_modal_temperature_hint: "Giá trị càng thấp, văn phong càng chặt chẽ và nhất quán với dữ liệu; càng cao, AI càng tự do diễn đạt và suy luận mở rộng hơn. Mặc định 1.0 (tối đa).",
+    ai_modal_length_label: "Độ dài báo cáo",
+    ai_modal_length_short: "Ngắn gọn",
+    ai_modal_length_medium: "Vừa phải",
+    ai_modal_length_long: "Đầy đủ & chi tiết",
+    ai_modal_options_label: "Bao gồm trong báo cáo",
+    ai_modal_opt_tables: "Bảng số liệu tóm tắt",
+    ai_modal_opt_interpretation: "Diễn giải & suy luận chuyên sâu",
+    ai_modal_opt_recommendations: "Khuyến nghị / hàm ý quản trị",
+    ai_modal_opt_limitations: "Hạn chế & hướng nghiên cứu tiếp theo",
+    ai_modal_prompt_label: "Yêu cầu cho báo cáo (có thể chỉnh sửa)",
+    ai_modal_run: "Sinh báo cáo",
+    ai_modal_invalid_key: "Vui lòng nhập OpenAI API key.",
+    ai_modal_invalid_prompt: "Vui lòng nhập yêu cầu cho báo cáo.",
+    ai_modal_prompt_default_sem: "Viết một báo cáo học thuật đầy đủ, mạch lạc dựa trên kết quả phân tích SEM ở trên: mô tả mô hình, diễn giải ý nghĩa các hệ số đường dẫn và các chỉ số đo lường, kết luận về các giả thuyết nghiên cứu, và đề xuất hàm ý quản trị/học thuật.",
+    ai_modal_prompt_default_sensitivity: "Viết báo cáo phân tích độ nhạy theo cỡ mẫu ở trên: nhận xét xu hướng biến động của R² (và p-value nếu có) khi cỡ mẫu giảm dần, đánh giá độ ổn định của mô hình, và đưa ra khuyến nghị về cỡ mẫu tối thiểu nên dùng.",
+    ai_modal_prompt_default_power: "Viết báo cáo phân tích Power Analysis ở trên: diễn giải ý nghĩa power theo từng path và từng cỡ mẫu, chỉ ra path nào cần cỡ mẫu lớn hơn để đạt power đủ (≥ 0.8), và đề xuất cỡ mẫu khuyến nghị cho nghiên cứu.",
+    ai_modal_prompt_default_mlcompare: "Viết báo cáo so sánh giữa hệ số đường dẫn SEM và feature importance của các thuật toán Machine Learning ở trên: nhận xét mức độ đồng thuận/khác biệt giữa hai cách tiếp cận, và kết luận về độ tin cậy của mô hình cấu trúc.",
+    ai_page_title: "Báo cáo AI",
+    ai_loading: "Đang sinh báo cáo bằng AI — với báo cáo \"Đầy đủ & chi tiết\" có thể mất 1-3 phút, đôi khi lâu hơn…",
+    ai_no_job: "Không tìm thấy yêu cầu — hãy mở trang này từ nút \"Báo cáo AI\" ở trang kết quả.",
+    ai_failed: "Sinh báo cáo thất bại.",
+    ai_generated_from: "Tạo từ:",
+    ai_your_prompt: "Yêu cầu của bạn:",
+    ai_image_path_diagram: "Sơ đồ đường dẫn (Path Diagram)",
+    ai_image_simple_slopes: "Biểu đồ độ dốc đơn giản (Simple Slopes)",
+    ai_image_power_chart: "Biểu đồ Power theo cỡ mẫu",
+    ai_image_ml_chart: "Biểu đồ so sánh — {target}",
+
+    s3_export_failed: "Xuất báo cáo thất bại.",
+    s3_loading_pls_boot: "Đang ước lượng mô hình và chạy Bootstrapping ({n} lần lặp — có thể mất vài chục giây)…",
+    s3_loading_pls: "Đang ước lượng mô hình…",
+    s3_loading_cbsem: "Đang ước lượng CB-SEM (Maximum Likelihood)…",
+    s3_analyze_failed: "Phân tích thất bại.",
+
+    // --- step 3: PLS result cards ---
+    s3_reliability_title: "Độ tin cậy & giá trị hội tụ (Reflective)",
+    s3_loadings_title: "Hệ số tải ngoài (Outer Loadings)",
+    s3_cross_loadings_title: "Cross Loadings",
+    s3_cross_loadings_hint: "Mỗi indicator nên tải cao nhất lên construct của chính nó.",
+    s3_fl_title: "Giá trị phân biệt — Fornell-Larcker",
+    s3_htmt_title: "Giá trị phân biệt — HTMT",
+    s3_path_title: "Mô hình cấu trúc — Path Coefficients & f²",
+    s3_total_effects_title: "Total & Indirect Effects (Kiểm định Mediation)",
+    s3_total_effects_hint: "Hiệu ứng gián tiếp = tổng tích các hệ số path dọc theo mọi đường đi qua biến trung gian (mediator); hiệu ứng tổng = trực tiếp + gián tiếp.",
+    s3_specific_indirect_title: "Hiệu ứng gián tiếp cụ thể (Specific Indirect Effects)",
+    s3_specific_indirect_hint: "Mỗi dòng là một đường đi trung gian cụ thể — khác với bảng Total & Indirect Effects vốn cộng gộp tất cả đường đi giữa một cặp construct. Nếu đã bootstrap, ý nghĩa thống kê được kiểm định trực tiếp trên tích của đúng lần lấy mẫu lại đó.",
+    s3_moderated_mediation_title: "Index of Moderated Mediation (Hayes, 2015)",
+    s3_moderated_mediation_hint: "Chỉ số đo hiệu ứng gián tiếp thay đổi bao nhiêu khi biến điều tiết tăng 1 đơn vị — cho các đường trung gian có đúng một đoạn (edge) bị điều tiết. Nếu đã bootstrap, ý nghĩa thống kê được kiểm định trực tiếp trên chỉ số này qua từng lần lấy mẫu lại.",
+    s3_moderated_mediation_hint_cbsem: "Chỉ số đo hiệu ứng gián tiếp thay đổi bao nhiêu khi biến điều tiết tăng 1 đơn vị — cho các đường trung gian có đúng một đoạn (edge) bị điều tiết. Ở CB-SEM đây là điểm ước lượng, chưa có kiểm định ý nghĩa thống kê riêng cho chỉ số này.",
+    s3_r2q2_title: "R² & Q² của biến nội sinh (Predictive Relevance)",
+    s3_vif_title: "Đa cộng tuyến (VIF)",
+    s3_cmb_title: "Common Method Bias — Full Collinearity Test",
+    s3_cmb_hint: "Mỗi construct hồi quy trên TẤT CẢ construct còn lại (không chỉ predictor trực tiếp) — kỹ thuật WarpPLS (Kock, 2015). Mọi VIF ≤ {threshold} nghĩa là mô hình không có dấu hiệu CMB.",
+    s3_bootstrap_dist_title: "Phân phối Bootstrap theo Path Coefficient",
+    s3_bootstrap_dist_hint: "Phân phối của {n} mẫu bootstrap hợp lệ cho từng hệ số đường dẫn. Vạch xanh liền = giá trị ước lượng gốc; vạch đỏ đứt = khoảng tin cậy 95%.",
+    lbl_bootstrap_hist_stats: "Gốc: {orig} · KTC 95%: [{lo}, {hi}]",
+    s3_slopes_title: "Biểu đồ độ dốc đơn giản (Simple Slopes)",
+    s3_slopes_hint: "Quan hệ giữa biến độc lập và biến kết quả tại ba mức của biến điều tiết (−1SD, Trung bình, +1SD), tính từ các hệ số path chuẩn hoá của chính lần chạy này (Aiken & West, 1991). Bấm \"⇄\" để đổi trục.",
+    s3_slopes_swap: "Đổi trục",
+    s3_slopes_low: "{name} tại −1 SD",
+    s3_slopes_mean: "{name} tại Trung bình",
+    s3_slopes_high: "{name} tại +1 SD",
+
+    // --- step 3: CB-SEM result cards ---
+    cbsem_fit_title: "Model Fit",
+    cbsem_reliability_title: "Độ tin cậy & giá trị hội tụ",
+    cbsem_loadings_title: "Factor Loadings",
+    cbsem_path_title: "Mô hình cấu trúc — Path Coefficients",
+    cbsem_r2_title: "R² của biến nội sinh",
+    cbsem_r2_hint: "Đã hiệu chỉnh sai lệch đo lường — thường cao hơn R² của PLS-SEM trên cùng dữ liệu.",
+
+    // --- convergence info ---
+    conv_converged: "Đã hội tụ",
+    conv_not_converged: "CHƯA hội tụ",
+    conv_after_iterations: "sau {n} vòng lặp",
+    conv_n_obs: "n = {n} quan sát hợp lệ.",
+    conv_bootstrap: "Bootstrapping: {valid}/{requested} mẫu hợp lệ.",
+    conv_cbsem_after: "({msg}) sau {n} vòng lặp",
+
+    // --- table headers (shared) ---
+    th_construct: "Construct",
+    th_endogenous_construct: "Construct nội sinh",
+    th_indicator: "Indicator",
+    th_outer_loading: "Outer Loading",
+    th_outer_weight: "Outer Weight",
+    th_stdev: "STDEV",
+    th_t_stat: "T Statistics",
+    th_p_value: "P Values",
+    th_significance: "Ý nghĩa (95%)",
+    th_note: "Ghi chú",
+    th_path: "Đường dẫn",
+    th_path_coefficient: "Path Coefficient (β)",
+    th_direct_effect: "Hiệu ứng trực tiếp",
+    th_indirect_effect: "Hiệu ứng gián tiếp",
+    th_total_effect: "Hiệu ứng tổng",
+    th_moderator: "Biến điều tiết",
+    th_mm_index: "Index",
+    th_f_squared: "f²",
+    th_f2_effect: "Mức ảnh hưởng f²",
+    th_r2: "R²",
+    th_r2_adj: "R² hiệu chỉnh",
+    th_r2_assessment: "Đánh giá R²",
+    th_q2: "Q² (blindfolding, D={d})",
+    th_q2_assessment: "Đánh giá Q²",
+    th_pair: "Cặp",
+    th_vif: "VIF",
+    th_assessment: "Đánh giá",
+    th_cronbachs_alpha: "Cronbach's α",
+    th_rho_a: "rho_A",
+    th_composite_reliability: "Composite Reliability",
+    th_ave: "AVE",
+    th_unstd: "Unstd.",
+    th_std_lambda: "Std. (λ)",
+    th_std_beta: "Std. (β)",
+    th_unstd_b: "Unstd. (B)",
+    th_se: "SE",
+    th_z: "z",
+    th_p: "p",
+    th_fit_index: "Chỉ số",
+    th_value: "Giá trị",
+
+    // --- labels / verdicts ---
+    lbl_dash: "—",
+    eta_remaining: "Ước lượng còn lại: ~{s} giây",
+    eta_almost_done: "Sắp xong, đang xử lý những bước cuối…",
+    lbl_r2_weak: "Yếu",
+    lbl_r2_moderate: "Trung bình",
+    lbl_r2_substantial: "Khá mạnh",
+    lbl_r2_strong: "Mạnh",
+    lbl_f2_none: "Không đáng kể",
+    lbl_f2_small: "Nhỏ",
+    lbl_f2_medium: "Trung bình",
+    lbl_f2_large: "Lớn",
+    lbl_moderation_badge: "Điều tiết",
+    lbl_htmt_good: "< {v} — đạt giá trị phân biệt",
+    lbl_htmt_warn: "{a}–{b} — ranh giới, cần xem xét",
+    lbl_htmt_critical: "≥ {v} — có thể vi phạm giá trị phân biệt",
+
+    // --- computation transparency section ---
+    src_transparency_title: "Minh bạch tính toán (Computation Transparency)",
+    src_transparency_hint: "Mã nguồn Python thật sự đã chạy để tính ra các kết quả ở trên, lấy trực tiếp từ mã đang chạy trên server (không phải bản sao chép tay).",
+    src_section_core_algorithm: "Thuật toán ước lượng cốt lõi",
+    src_section_measurement_metrics: "Độ tin cậy & giá trị hội tụ/phân biệt (rho_A, CR, AVE, HTMT, f²)",
+    src_section_cmb: "Common Method Bias (Full Collinearity VIF)",
+    src_section_mediation: "Hiệu ứng trung gian (Total & Indirect Effects)",
+    src_section_moderation: "Biến điều tiết (Moderation)",
+    src_section_bootstrap: "Bootstrapping (kiểm định ý nghĩa thống kê)",
+    src_section_blindfolding: "Blindfolding (Q² — predictive relevance)",
+    src_section_ml_engine: "Vòng lặp k-fold & permutation importance (ml_compare/engine.py)",
+    src_section_ml_algorithms: "Khởi tạo các thuật toán đã chọn (ml_compare/registry.py)",
+
+    // --- results reading guide (bottom of PLS-SEM / CB-SEM results pages) ---
+    results_guide_section_title: "Hướng dẫn đọc & Ý nghĩa các chỉ số",
+    results_guide_measurement_summary: "Mô hình đo lường (Outer Model)",
+    results_guide_measurement_body:
+      "<ul>" +
+      "<li><strong>Outer Loadings:</strong> tương quan giữa mỗi indicator và construct chứa nó. Với construct reflective, nên ≥0.7; 0.4–0.7 có thể cân nhắc loại bỏ nếu việc loại không làm giảm AVE/độ tin cậy. <strong>Cross Loadings</strong> cho thấy mỗi indicator nên tải cao nhất lên đúng construct của chính nó, không phải construct khác.</li>" +
+      "<li><strong>Cronbach's Alpha, rho_A, Composite Reliability (CR):</strong> đo độ tin cậy nhất quán nội bộ — thường xem ≥0.7 là chấp nhận được (0.6–0.7 có thể chấp nhận ở nghiên cứu khám phá).</li>" +
+      "<li><strong>AVE (Average Variance Extracted):</strong> đo giá trị hội tụ — nên ≥0.5 (construct giải thích được ít nhất 50% phương sai của các indicator của nó).</li>" +
+      "</ul>",
+    results_guide_discriminant_summary: "Giá trị phân biệt (Discriminant Validity)",
+    results_guide_discriminant_body:
+      "<ul>" +
+      "<li><strong>Fornell-Larcker:</strong> căn bậc hai AVE trên đường chéo nên lớn hơn tương quan giữa construct đó với bất kỳ construct nào khác.</li>" +
+      "<li><strong>HTMT (Heterotrait-Monotrait Ratio):</strong> nên &lt;0.85 (khắt khe) hoặc &lt;0.90 (khi các construct gần nhau về khái niệm) theo Henseler et al. (2015); ≥0.90 là dấu hiệu vi phạm giá trị phân biệt.</li>" +
+      "</ul>",
+    results_guide_structural_summary: "Mô hình cấu trúc — Path Coefficients",
+    results_guide_structural_body:
+      "<ul>" +
+      "<li><strong>Path coefficient (β chuẩn hoá):</strong> dấu (+/−) và độ lớn thể hiện chiều và cường độ quan hệ giữa hai construct.</li>" +
+      "<li>Nếu đã bật <strong>Bootstrapping</strong>: các cột STDEV / T-Statistics / P-Values / Ý nghĩa cho biết path có ý nghĩa thống kê khi p &lt; 0.05 (tương đương |T| &gt; 1.96 với kiểm định 2 đuôi).</li>" +
+      "<li><strong>f² (effect size):</strong> &lt;0.02 không đáng kể, 0.02–0.15 nhỏ, 0.15–0.35 vừa, ≥0.35 lớn (Cohen, 1988). Riêng path từ biến điều tiết (interaction) dùng ngưỡng nhỏ hơn nhiều: 0.005/0.01/0.025 (Kenny 2018; Aguinis et al. 2005).</li>" +
+      "</ul>",
+    results_guide_mediation_summary: "Hiệu ứng trung gian (Mediation)",
+    results_guide_mediation_body:
+      "<ul>" +
+      "<li><strong>Total &amp; Indirect Effects:</strong> hiệu ứng gián tiếp = tổng tích các path coefficient dọc theo <em>mọi</em> đường đi qua biến trung gian, giữa một cặp construct; hiệu ứng tổng = trực tiếp + gián tiếp.</li>" +
+      "<li><strong>Specific Indirect Effects:</strong> tách riêng <em>từng</em> đường đi trung gian cụ thể (thay vì cộng gộp như bảng trên) — nếu đã bootstrap, mỗi đường đi cũng được kiểm định ý nghĩa thống kê riêng, dựa trên đúng tích số của các hệ số trong cùng một lần lấy mẫu lại.</li>" +
+      "<li><strong>Index of Moderated Mediation (Hayes, 2015):</strong> chỉ xuất hiện khi mô hình vừa có mediator vừa có moderator tác động lên đúng một đoạn của đường trung gian đó (Model 7/14 của PROCESS). Chỉ số này là <em>độ dốc</em> của hiệu ứng gián tiếp theo biến điều tiết — hiệu ứng gián tiếp thay đổi bao nhiêu khi biến điều tiết tăng 1 đơn vị. Nếu khoảng tin cậy 95% của chỉ số không chứa 0 → mức độ điều tiết lên hiệu ứng gián tiếp có ý nghĩa thống kê, chặt chẽ hơn việc chỉ so sánh \"có ý nghĩa ở nhóm này nhưng không ở nhóm kia\".</li>" +
+      "</ul>",
+    results_guide_predictive_summary: "R², Q² & Đa cộng tuyến (VIF)",
+    results_guide_predictive_body:
+      "<ul>" +
+      "<li><strong>R²:</strong> 0.19 yếu, 0.33 trung bình, 0.67 mạnh (Chin, 1998) — chỉ là ngưỡng tham khảo, tùy lĩnh vực nghiên cứu.</li>" +
+      "<li><strong>Q² (Predictive Relevance, từ Blindfolding):</strong> &gt;0 nghĩa là mô hình có khả năng dự báo ngoài mẫu cho construct đó; ≤0 nghĩa là không.</li>" +
+      "<li><strong>VIF (Inner/Outer):</strong> nên &lt;3.3 (hoặc &lt;5 nếu nới lỏng hơn) để tránh đa cộng tuyến làm méo các hệ số ước lượng.</li>" +
+      "</ul>",
+    results_guide_cmb_summary: "Common Method Bias",
+    results_guide_cmb_body:
+      "<p>Full collinearity VIF (Kock, 2015): mỗi construct được hồi quy trên <strong>tất cả</strong> construct còn lại trong mô hình, không chỉ predictor trực tiếp của nó. VIF ≤ ngưỡng (mặc định 3.3) nghĩa là không có dấu hiệu common method bias đáng kể.</p>",
+    results_guide_slopes_summary: "Simple Slopes (khi có biến điều tiết)",
+    results_guide_slopes_body:
+      "<p>Ba đường tại −1SD / Trung bình / +1SD của biến điều tiết cho thấy quan hệ giữa biến độc lập và biến kết quả thay đổi ra sao theo mức độ của biến điều tiết (Aiken &amp; West, 1991). Ba đường càng tách xa nhau (không song song) → tương tác càng mạnh; ba đường gần như song song → tương tác yếu, dù hệ số path của interaction có ý nghĩa thống kê hay không.</p>",
+    results_guide_bootstrap_dist_summary: "Phân phối Bootstrap (khi đã bật Bootstrapping)",
+    results_guide_bootstrap_dist_body:
+      "<p>Mỗi biểu đồ là phân phối của một hệ số path qua toàn bộ số lần lấy mẫu lại (resample). Vạch xanh liền = giá trị ước lượng gốc; vạch đỏ đứt = khoảng tin cậy 95% (percentile). Nếu khoảng tin cậy 95% không chứa 0, path đó có ý nghĩa thống kê.</p>",
+    cbsem_guide_fit_summary: "Model Fit",
+    cbsem_guide_fit_body:
+      "<ul>" +
+      "<li><strong>Chi-square / df:</strong> càng nhỏ càng tốt — thường χ²/df &lt; 3 được xem là chấp nhận được.</li>" +
+      "<li><strong>CFI, TLI:</strong> ≥0.90 chấp nhận được, ≥0.95 tốt.</li>" +
+      "<li><strong>RMSEA:</strong> ≤0.08 chấp nhận được, ≤0.05 tốt.</li>" +
+      "<li><strong>SRMR:</strong> ≤0.08 chấp nhận được.</li>" +
+      "<li>Đây chỉ là ngưỡng tham khảo — nên xem xét nhiều chỉ số cùng lúc, không dựa hoàn toàn vào một chỉ số riêng lẻ.</li>" +
+      "</ul>",
+    cbsem_guide_measurement_body:
+      "<ul>" +
+      "<li><strong>Cronbach's Alpha, Composite Reliability (CR), AVE:</strong> ngưỡng tham khảo giống PLS-SEM — CR ≥0.7, AVE ≥0.5.</li>" +
+      "<li><strong>Factor Loadings:</strong> cột Unstd./Std./SE/z/p — ý nghĩa thống kê dựa trên kiểm định z (Wald test) từ ước lượng Maximum Likelihood, khác với PLS-SEM (vốn luôn cần Bootstrap vì không có công thức sai số chuẩn dạng đóng).</li>" +
+      "</ul>",
+    cbsem_guide_structural_body:
+      "<ul>" +
+      "<li><strong>Unstd. (B):</strong> hệ số hồi quy chưa chuẩn hoá, theo đơn vị gốc của thang đo. <strong>Std. (β):</strong> hệ số đã chuẩn hoá, so sánh được giữa các path.</li>" +
+      "<li><strong>SE, z, p:</strong> ý nghĩa thống kê được kiểm định bằng z-test (Wald test) trực tiếp từ ma trận hiệp phương sai ước lượng của Maximum Likelihood — không cần chạy Bootstrap như PLS-SEM. Path có ý nghĩa khi p &lt; 0.05.</li>" +
+      "</ul>",
+    cbsem_guide_mediation_body:
+      "<ul>" +
+      "<li><strong>Total &amp; Indirect Effects:</strong> hiệu ứng gián tiếp = tổng tích các path coefficient dọc theo <em>mọi</em> đường đi qua biến trung gian, giữa một cặp construct; hiệu ứng tổng = trực tiếp + gián tiếp.</li>" +
+      "<li><strong>Specific Indirect Effects:</strong> tách riêng <em>từng</em> đường đi trung gian cụ thể — ở CB-SEM đây chỉ là điểm ước lượng (point estimate), <strong>chưa</strong> có kiểm định ý nghĩa thống kê riêng cho từng đường đi (cần một phương pháp riêng, ví dụ delta method/Sobel test, để suy ra sai số chuẩn của một tích số).</li>" +
+      "<li><strong>Index of Moderated Mediation (Hayes, 2015):</strong> chỉ xuất hiện khi mô hình vừa có mediator vừa có moderator tác động lên đúng một đoạn của đường trung gian đó. Đây là <em>độ dốc</em> của hiệu ứng gián tiếp theo biến điều tiết — ở CB-SEM cũng chỉ là điểm ước lượng, chưa có kiểm định ý nghĩa thống kê riêng.</li>" +
+      "</ul>",
+    cbsem_guide_r2cmb_summary: "R² & Common Method Bias",
+    cbsem_guide_r2cmb_body:
+      "<ul>" +
+      "<li><strong>R²:</strong> 0.19 yếu, 0.33 trung bình, 0.67 mạnh (Chin, 1998) — R² của CB-SEM thường cao hơn PLS-SEM trên cùng dữ liệu vì đã hiệu chỉnh sai lệch đo lường.</li>" +
+      "<li><strong>Common Method Bias (Full collinearity VIF, Kock 2015):</strong> mỗi construct được hồi quy trên tất cả construct còn lại; VIF ≤ ngưỡng (mặc định 3.3) nghĩa là không có dấu hiệu common method bias đáng kể.</li>" +
+      "</ul>",
+
+    lbl_q2_none: "Không có ý nghĩa dự báo",
+    lbl_significant: "p < 0.05",
+    lbl_not_significant: "Không ý nghĩa",
+    lbl_reference_indicator: "Biến tham chiếu",
+    lbl_formative_note: "Formative (Mode B) — không áp dụng chỉ số độ tin cậy nội bộ",
+    lbl_no_vif_pairs: "Không có construct nào có ≥2 tiền tố / biến formative để kiểm tra đa cộng tuyến.",
+    lbl_vif_high: "Cao (>5)",
+    lbl_vif_acceptable: "Chấp nhận được",
+    lbl_cmb_ok: "Không có dấu hiệu CMB",
+    lbl_cmb_warn: "Có khả năng bị CMB",
+    lbl_fit_good: "Tốt",
+    lbl_fit_acceptable: "Chấp nhận được",
+    lbl_fit_poor: "Chưa đạt",
+    suffix_structural: " (cấu trúc)",
+    suffix_formative_measurement: " (đo lường formative)",
+
+    // --- CB-SEM fit index labels ---
+    fit_chi_square: "Chi-square (χ²)",
+    fit_df: "Degrees of Freedom (df)",
+    fit_chi2_p: "χ² p-value",
+    fit_cfi: "CFI",
+    fit_tli: "TLI",
+    fit_rmsea: "RMSEA",
+    fit_srmr: "SRMR",
+    fit_gfi: "GFI",
+    fit_agfi: "AGFI",
+    fit_nfi: "NFI",
+    fit_aic: "AIC",
+    fit_bic: "BIC",
+
+    // --- diagram.js ---
+    diagram_reflective: "Reflective",
+    diagram_formative: "Formative",
+  },
+
+  en: {
+    nav_step1: "1. Data",
+    nav_step2: "2. Model",
+    nav_step3: "3. Results",
+    nav_sample: "Use sample data",
+    nav_sample_moderation: "Sample data (Mediator + Moderator)",
+    nav_guide: "📖 User Guide",
+
+    s1_title: "Upload survey data",
+    s1_hint: "Supports CSV or Excel (.xlsx). Each column is one indicator (item), each row is one observation. Maximum 5000 rows.",
+    s1_dropzone_text: "Drag and drop a file here or",
+    s1_browse: "choose a file",
+    s1_preview_title: "Data preview ({rows} rows, {cols} columns)",
+    s1_continue: "Continue: Build the model →",
+    s1_selected_file: "Selected: {name}",
+
+    s1_tab_upload: "📁 Upload data",
+    s1_tab_ai_gen: "🤖 AI Lab",
+    s1_ai_back: "← Back",
+    s1_ai_next: "Next →",
+
+    s1_ai_codebook_title: "Step 1: Define the survey questions",
+    s1_ai_codebook_hint: "Each row is one indicator. The question text helps the AI infer which construct is being measured, for more internally-consistent generated data.",
+    s1_ai_codebook_col_column: "Column name",
+    s1_ai_codebook_col_construct: "Construct",
+    s1_ai_codebook_col_question: "Interview question text",
+    s1_ai_codebook_col_type: "Question type",
+    s1_ai_codebook_type_likert: "Quantitative (Likert)",
+    s1_ai_codebook_type_qualitative: "Qualitative (text)",
+    s1_ai_codebook_add_row: "+ Add indicator",
+    s1_ai_codebook_remove: "Remove",
+    s1_ai_codebook_export: "⬇ Export definition",
+    s1_ai_codebook_import: "⬆ Import definition",
+    s1_ai_codebook_import_hint: "Accepts a definition file (JSON) or a model file exported from Step 2 (constructs + indicators).",
+    s1_ai_codebook_import_failed: "Import failed: {msg}",
+    s1_ai_codebook_duplicate_column: "Duplicate column name: {name}",
+    s1_ai_codebook_empty_column: "Please name every column.",
+    s1_ai_codebook_min_rows: "Please add at least one indicator.",
+
+    s1_ai_construct_search_toggle: "🔍 Search constructs & indicators with AI (literature review)",
+    s1_ai_construct_search_topic_label: "Research topic / context",
+    s1_ai_construct_search_topic_placeholder: "e.g. Students' intention to use mobile wallets, based on an extended TAM",
+    s1_ai_construct_search_count_label: "Approx. number of constructs",
+    s1_ai_construct_search_run: "Search constructs",
+    s1_ai_construct_search_loading: "Searching...",
+    s1_ai_construct_search_cancel: "Cancel",
+    s1_ai_construct_search_add: "+ Add selected to table",
+    s1_ai_construct_search_missing_topic: "Please enter a research topic / context.",
+    s1_ai_construct_search_disclaimer: "⚠️ AI-generated citation — verify before using it in your paper.",
+
+    s1_ai_all_config_export: "⬇ Export full configuration (CSV)",
+    s1_ai_all_config_import: "⬆ Import full configuration (CSV)",
+    s1_ai_all_config_import_failed: "Config import failed: {msg}",
+    s1_ai_all_config_import_bad_file: "This file isn't a valid configuration file.",
+
+    s1_ai_demo_title: "Step 2: Respondent profile",
+    s1_ai_demo_hint: "All fields are optional, but the more specific they are, the more realistic the AI-generated data will be.",
+    s1_ai_demo_age: "Age range",
+    s1_ai_demo_age_to: "to",
+    s1_ai_demo_gender: "Gender",
+    s1_ai_demo_gender_any: "No constraint",
+    s1_ai_demo_gender_balanced: "Balanced male/female",
+    s1_ai_demo_gender_mostly_male: "Mostly male",
+    s1_ai_demo_gender_mostly_female: "Mostly female",
+    s1_ai_demo_occupation: "Occupation / education",
+    s1_ai_demo_occupation_placeholder: "e.g. university students",
+    s1_ai_demo_location: "Location",
+    s1_ai_demo_location_placeholder: "e.g. Ho Chi Minh City",
+    s1_ai_demo_target_population: "Target population description",
+    s1_ai_demo_target_population_hint: "The more detail you give, the more the generated data will match your study's context.",
+    s1_ai_demo_target_population_placeholder: "e.g. Junior/senior Economics students who have used a mobile wallet in the last 6 months",
+
+    s1_ai_demo_attrs_title: "Additional demographic attributes (optional)",
+    s1_ai_demo_attrs_hint: "Numeric (min-max range) or categorical (comma-separated option list). Up to 6 attributes.",
+    s1_ai_demo_attrs_col_name: "Attribute name",
+    s1_ai_demo_attrs_col_type: "Type",
+    s1_ai_demo_attrs_col_value: "Numeric range or option list",
+    s1_ai_demo_attrs_add_row: "+ Add attribute",
+    s1_ai_demo_attrs_type_numeric: "Numeric (range)",
+    s1_ai_demo_attrs_type_categorical: "Categorical (list)",
+    s1_ai_demo_attrs_value_placeholder_numeric: "e.g. 5,50",
+    s1_ai_demo_attrs_value_placeholder_categorical: "e.g. High school, College, Bachelor, Postgraduate",
+    s1_ai_demo_attrs_invalid_numeric: "Attribute '{name}': enter a numeric range as min,max (e.g. 5,50).",
+    s1_ai_demo_attrs_invalid_categorical: "Attribute '{name}': enter at least 2 options, separated by commas.",
+
+    s1_ai_config_title: "Step 3: Settings & prompt",
+    s1_ai_config_n_rows: "Number of observations to generate",
+    s1_ai_config_n_rows_hint: "Capped at {max}, chunked into batches of ~{batch} rows per AI call.",
+    s1_ai_config_likert: "Likert scale",
+    s1_ai_config_likert5: "5-point (1-5)",
+    s1_ai_config_likert7: "7-point (1-7)",
+    s1_ai_config_batch_size: "Rows per AI call",
+    s1_ai_config_batch_size_hint: "From 1 to 50.",
+    s1_ai_config_system_prompt_label: "System prompt (editable)",
+    s1_ai_config_user_prompt_label: "Request sent to the AI (editable)",
+    s1_ai_config_first_batch_preview_label: "Preview: what will actually be sent to the AI for the first batch",
+    s1_ai_config_regenerate: "🔄 Regenerate suggestion",
+    s1_ai_config_generate_btn: "▶ Generate data",
+    s1_ai_config_missing_key: "Please enter an API key.",
+
+    s1_ai_gen_progress: "Generating batch {done}/{total}…",
+    s1_ai_gen_finalizing: "Finalizing…",
+    s1_ai_gen_error_batch: "Error generating data: {detail}",
+    s1_ai_gen_error_incomplete: "only generated {got}/{total} rows after repeated AI calls -- please retry or lower the rows-per-call setting.",
+    s1_ai_gen_retry_batch: "Retry this batch",
+    s1_ai_gen_cancel: "Cancel",
+    s1_ai_gen_download: "⬇ Download generated CSV",
+    s1_ai_gen_success: "Successfully generated {n} observations.",
+
+    s1_ai_result_export_btn: "⬇ Export everything (Excel)",
+    s1_ai_result_demo_title: "Respondent profile",
+    s1_ai_result_demo_occupation: "Occupation / education",
+    s1_ai_result_demo_location: "Location",
+    s1_ai_result_demo_target_population: "Target population description",
+    s1_ai_result_demo_age_range: "Declared age range",
+    s1_ai_result_demo_gender_mix: "Declared gender mix",
+    s1_ai_result_stats_title: "Descriptive statistics",
+    s1_ai_result_stats_indicators_title: "Indicators (Likert scale)",
+    s1_ai_result_stats_demo_title: "Respondent demographics",
+    s1_ai_result_stats_col: "Column",
+    s1_ai_result_stats_mean: "Mean",
+    s1_ai_result_stats_std: "Std. Dev.",
+    s1_ai_result_stats_min: "Min",
+    s1_ai_result_stats_max: "Max",
+    s1_ai_result_stats_age_row: "Age (resp_age)",
+    s1_ai_result_stats_gender_col: "Gender",
+    s1_ai_result_stats_gender_male: "Male",
+    s1_ai_result_stats_gender_female: "Female",
+    s1_ai_result_stats_option_col: "Option",
+    s1_ai_result_stats_count: "Count",
+    s1_ai_result_stats_pct: "Percent (%)",
+    s1_ai_result_transparency_title: "Prompt transparency (by batch)",
+    s1_ai_result_transparency_hint: "Each batch generates several rows from the SAME prompt (not one prompt per row).",
+    s1_ai_result_transparency_batch: "Batch {n} — Rows {start}-{end}",
+    s1_ai_result_transparency_system: "System prompt",
+    s1_ai_result_transparency_user: "Request sent to the AI",
+
+    // --- step 1: AI Lab Experiment (worker pool + condition-based survey) ---
+    s1_tab_ai_experiment: "🧪 AI Lab Experiment",
+    exp_step1_title: "Step 1: Define the AI Worker pool (participants)",
+    exp_step1_hint: "Describe the target population, then the AI will create N AI Worker profiles (persona + demographics) -- no survey answers yet.",
+    exp_pool_import: "⬆ Import an existing Worker Pool (Excel)",
+    exp_pool_template: "⬇ Download template (Excel)",
+    exp_pool_import_failed: "Import failed: {msg}",
+    exp_population_prompt_label: "Overall population description",
+    exp_population_prompt_placeholder: "e.g. Office workers aged 25-40 in major cities who have shopped online before",
+    exp_n_workers_label: "Number of AI Workers to create (N)",
+    exp_n_workers_hint: "Up to 500 AI Workers, reusable across many later survey runs.",
+    exp_combined_prompt_label: "Prompt sent to the AI (full, editable)",
+    exp_combined_prompt_hint: "This is the entire content that will be sent to the AI to generate the Worker Pool -- you can edit it directly before running.",
+    exp_generate_pool_btn: "▶ Generate Worker Pool",
+    exp_step2_title: "Step 2: Worker Pool ready",
+    exp_pool_ready_summary: "Created {n} AI Workers -- export to Excel, or continue to design the experiment.",
+    exp_pool_export: "⬇ Export Worker Pool (Excel)",
+    exp_step3_title: "Step 3: Design the experiment",
+    exp_m_label: "Number of Workers taking the survey (M ≤ N)",
+    exp_m_hint: "Total Workers across condition groups: {total}/{m}.",
+    exp_shared_context_label: "Shared context (applies to every group)",
+    exp_shared_context_hint: "The common situation ALL participants experience, identical across groups -- the part that differs between groups goes in the \"Manipulation\" table below.",
+    exp_shared_context_placeholder: "E.g.: You are browsing a product on an e-commerce site...",
+    exp_groups_title: "Condition Groups",
+    exp_groups_hint: "Each group has its own manipulation; the groups' sizes must sum to M. Up to 6 groups.",
+    exp_groups_col_condition: "Manipulation",
+    exp_groups_col_size: "Number of Workers",
+    exp_groups_add_row: "+ Add condition group",
+    exp_groups_min_rows: "Please add at least one condition group.",
+    exp_groups_size_mismatch: "The groups' total ({total}) must exactly equal M ({m}).",
+    exp_select_btn: "🎲 Randomly select Workers",
+    exp_selected_title: "Selected Workers by group",
+    exp_excluded_title: "Excluded Workers (not taking the survey)",
+    exp_excluded_none: "No workers excluded (all N were selected).",
+    exp_group_n: "Group {n}",
+    exp_select_first: "Please click \"Randomly select Workers\" first.",
+    exp_survey_prompt_preview_title: "Prompt sent to the AI per group (full, editable)",
+    exp_survey_prompt_preview_hint: "This is all the information (each Worker's profile + condition + survey questions) that will be sent to the AI -- you can edit it directly before running.",
+    exp_survey_preview_btn: "🔍 Preview Prompt",
+    exp_survey_start_btn: "▶ Generate survey data",
+    exp_live_transparency_title: "🔍 Prompt transparency (updates live as each batch runs)",
+    exp_live_transparency_pool_batch: "Batch {n} — Rows {start}-{end}",
+    exp_live_transparency_survey_batch: "Group {group} — Batch {n} (workers: {ids})",
+
+    msg_upload_failed: "Upload failed.",
+    msg_sample_failed: "Could not load sample data.",
+
+    s2_add_construct: "+ Construct",
+    s2_draw_path: "↗ Draw path",
+    s2_ai_draw_paths: "🤖 AI draw model",
+    s2_ai_draw_paths_disabled_hint: "At least 2 constructs are needed for AI to propose a model.",
+    s2_ai_paths_modal_title: "Use AI to suggest the structural model",
+    s2_ai_paths_modal_hint: "AI will infer paths between the existing constructs based on their names and indicators.",
+    s2_ai_paths_context_label: "Additional research context (optional)",
+    s2_ai_paths_context_placeholder: "e.g. A study on students' intention to use mobile wallets...",
+    s2_ai_paths_loading: "Analyzing and proposing a model...",
+    s2_ai_paths_run: "Suggest model",
+    s2_ai_paths_review_title: "Preview the AI-proposed model",
+    s2_ai_paths_rationale_label: "AI's explanation",
+    s2_ai_paths_back: "← Back",
+    s2_ai_paths_apply: "Apply",
+    s2_ai_paths_applied: "Applied {applied}/{total} selected paths.",
+    s2_ai_paths_prompt_review_title: "Review the prompt before sending it to AI",
+    s2_ai_paths_prompt_review_hint: "The model structure (especially moderator/interaction variables) can be a matter of semantic judgment — review and edit the text below before sending it.",
+    s2_ai_paths_send: "Send to AI",
+    s2_dummy_btn: "🔢 Create dummy variables",
+    s2_dummy_modal_title: "Create dummy variables from a categorical variable",
+    s2_dummy_modal_hint: "k−1 coding: a variable with k categories yields k−1 columns of 0/1, one for each category other than the reference. Each dummy's coefficient is read as the difference from the reference category. The new columns are added to the data and work like any other indicator — as an independent variable or a control variable.",
+    s2_dummy_column_label: "Categorical variable",
+    s2_dummy_levels_suffix: "categories",
+    s2_dummy_reference_label: "Choose the reference category",
+    s2_dummy_th_reference: "Reference",
+    s2_dummy_th_level: "Value",
+    s2_dummy_th_count: "Observations",
+    s2_dummy_th_new_column: "New dummy column",
+    s2_dummy_reference_baseline: "(reference — no column created)",
+    s2_dummy_missing_hint: "{n} observations are missing on this variable — the dummies will be empty on those rows too.",
+    s2_dummy_add_constructs: "Automatically add a single-indicator construct for each dummy to the model",
+    s2_dummy_create: "Create dummies",
+    s2_dummy_no_candidates: "No suitable categorical variable (needs a column with 2 to 12 distinct values).",
+    s2_dummy_success: "Created dummy variables: {columns} (reference: {reference}). Draw paths from these constructs to the dependent variable to use them as independent or control variables.",
+    s2_qual_score_btn: "🤖 Score open-ended questions",
+    s2_qual_score_modal_title: "Score a qualitative (open-ended) question with AI",
+    s2_qual_score_modal_hint: "The AI reads each person's open-ended answer and scores it against the rubric you enter below, producing a new Likert indicator ready to use in the model. Only applies to data generated by AI Lab/AI Lab Experiment.",
+    s2_qual_score_column_label: "Open-ended column to score",
+    s2_qual_score_rubric_label: "Scoring rubric",
+    s2_qual_score_rubric_placeholder: "E.g.: Score the satisfaction expressed in the answer, from 1 (very dissatisfied) to 5 (very satisfied)...",
+    s2_qual_score_new_column_label: "New indicator name",
+    s2_qual_score_run: "▶ Run scoring",
+    s2_qual_score_missing_rubric: "Please enter a scoring rubric.",
+    s2_qual_score_missing_new_column: "Please name the new indicator.",
+    s2_qual_score_success: "Added new indicator \"{column}\" — ready to use in the model.",
+    s2_export_csv_btn: "⬇ Export data (CSV)",
+    s2_export_excel_btn: "⬇ Export full (Excel)",
+    footer_clear_session: "🗑 Clear session",
+    footer_clear_session_confirm: "Clear the entire saved session (data, model, results, any in-progress AI Lab work) and start fresh? This cannot be undone.",
+    s2_ai_draw_paths_skip_shortcut: "⏭ Skip to model building",
+    s2_run_no_data_hint: "Real data (uploaded or AI-generated) is required before running an analysis.",
+    s2_ai_paths_save_all: "💾 Save all proposals",
+    s2_ai_moderator_suggestions_label: "Constructs AI suggests may be moderators",
+    s2_ai_moderator_suggestions_hint: "After converting, that construct is temporarily assigned the first two eligible interaction sources — open the side panel to change the pair if the AI's default guess isn't right.",
+    s2_ai_moderator_convert_btn: "Convert to Interaction",
+    s2_ai_moderator_converted: "✓ Converted",
+    s2_ai_moderator_pick_sources_hint: "Temporarily set as {a} × {b} — open this construct on the canvas to change it if that's not right.",
+    s2_ai_rationale_title: "📖 Model rationale (AI)",
+    s2_ai_rationale_hint: "AI-generated — verify before using it officially.",
+    s2_delete_selected: "🗑 Delete selection",
+    s2_export_model: "⬇ Export model",
+    s2_import_model: "⬆ Import model",
+    s2_toolbar_hint_default: 'Double-click the canvas or click "+ Construct" to add a latent variable.',
+    s2_toolbar_hint_path_mode: "Click the source construct then the target construct to draw a structural path.",
+
+    s2_method_title: "Estimation method",
+    s2_method_pls: "PLS-SEM (Partial Least Squares)",
+    s2_method_cbsem: "CB-SEM (Maximum Likelihood / Covariance-Based)",
+    s2_method_hint_pls: "Composite-based, suits non-normal data/small samples, supports formative constructs.",
+    s2_method_hint_cbsem: "Covariance-based (Maximum Likelihood): provides model fit indices (CFI, RMSEA, SRMR...) and significance testing directly, but only supports reflective constructs.",
+    s2_construct_props: "Construct Properties",
+    s2_no_selection: "Select a construct on the canvas to edit it.",
+    s2_construct_name: "Construct name",
+    s2_measurement_type: "Measurement type",
+    s2_mode_reflective: "Reflective (Mode A)",
+    s2_mode_formative: "Formative (Mode B)",
+    s2_mode_interaction: "Interaction / moderation term (A × B, optionally C)",
+    s2_indicators_label: "Indicators",
+    s2_interaction_sources_label: "Interaction term sources (pick 2 or 3 constructs)",
+    s2_interaction_source_a: "Construct A",
+    s2_interaction_source_b: "Construct B",
+    s2_interaction_source_c: "Construct C (optional — three-way interaction)",
+    s2_interaction_source_c_none: "— none —",
+    s2_interaction_not_enough: "Need at least 2 other constructs (not themselves interaction terms) to create an interaction term.",
+    s2_interaction_same_source: "The source constructs must be different.",
+    s2_interaction_three_way_two_stage_note: "A three-way interaction only supports the Two Stage method.",
+    s2_moderator_attach_rejected: "Can't attach this construct as a moderator here (already three-way, or this construct is itself an interaction term).",
+    s2_calc_method_label: "Calculation Method",
+    s2_calc_method_product_indicator: "Product Indicator",
+    s2_calc_method_two_stage: "Two Stage",
+    s2_calc_method_orthogonalization: "Orthogonalization",
+    s2_calc_method_cbsem_note: "Note: CB-SEM always uses Two Stage regardless of this setting (Product Indicator/Orthogonalization only apply to PLS-SEM).",
+    s2_product_term_label: "Product Term Generation (Advanced Settings)",
+    s2_product_term_unstandardized: "Unstandardized",
+    s2_product_term_mean_centered: "Mean Centered",
+    s2_product_term_standardized: "Standardized",
+    s2_product_term_two_stage_note: "Two Stage always multiplies two stage-1 factor scores — which are already standardized by definition (Henseler & Chin, 2010) — so there's no other choice to make here.",
+    s2_model_overview: "Model Overview",
+    s2_bootstrapping: "Bootstrapping",
+    s2_bootstrap_enable: "Significance testing (t-values, p-values)",
+    s2_bootstrap_reps_label: "Number of resamples",
+    s2_bootstrap_100: "100 (fast)",
+    s2_bootstrap_500: "500 (recommended)",
+    s2_bootstrap_1000: "1000",
+    s2_bootstrap_2000: "2000",
+    s2_bootstrap_5000: "5000 (slow, ~30-60s)",
+    s2_bootstrap_hint: "Bootstrapping draws many resamples from the original data to estimate the standard deviation, t-value and p-value for each path coefficient — needed to report statistical significance (p < 0.05) in research.",
+    s2_cbsem_note: "CB-SEM already computes SE/z-value/p-value via Maximum Likelihood — bootstrapping is not needed.",
+    s2_run_pls: "▶ Run PLS Algorithm",
+    s2_run_cbsem: "▶ Run CB-SEM (ML)",
+
+    s2_summary_reflective: "Reflective",
+    s2_summary_formative: "Formative",
+    s2_summary_interaction: "Interaction term",
+    s2_summary_item_suffix: "item(s)",
+    s2_summary_paths_suffix: "structural path(s)",
+    s2_summary_toggle_aria: "Show/hide indicators",
+    s2_path_rejected: "This path can't be created (duplicate, reverse of an existing one, or would create a cycle).",
+
+    modal_title: "Add New Construct",
+    modal_name_label: "Construct name",
+    modal_name_placeholder: "e.g. Satisfaction",
+    modal_mode_label: "Measurement type",
+    modal_cancel: "Cancel",
+    modal_add: "Add",
+
+    s2_import_missing_arrays: "The JSON file is missing the 'constructs' or 'paths' array.",
+    s2_import_missing_fields: "A construct in the file is missing id/name/mode/indicators.",
+    s2_import_failed: "Could not import the model: {msg}",
+
+    s3_path_diagram_title: "Result Path Diagram",
+    s3_path_diagram_title_cbsem: "Result Path Diagram — CB-SEM",
+    s3_dashed_hint: "Dashed line = path not statistically significant (p ≥ 0.05) per the Bootstrapping result.",
+    s3_dashed_hint_cbsem: "Coefficients shown are standardized (β); dashed line = not statistically significant (p ≥ 0.05).",
+    s3_export_excel: "📊 Export Excel",
+    s3_export_word: "📄 Export Word",
+    s3_sensitivity_btn: "📉 Sample Size Sensitivity",
+    s3_power_btn: "⚡ Power Analysis",
+    s3_ml_compare_btn: "🤖 ML Comparison",
+    s3_mga_btn: "🔀 Multi-group comparison (PLS-MGA)",
+    s3_plspredict_btn: "🔮 PLSpredict",
+    s3_plspredict_running: "Running k-fold…",
+    s3_plspredict_title: "PLSpredict — Out-of-Sample Predictive Validity",
+    s3_plspredict_hint: "Compares the PLS model's k-fold cross-validated prediction error against a simple linear regression (LM) benchmark on the same data — if PLS can't beat LM, the model may lack real predictive value even with a high in-sample R² (Shmueli et al., 2016).",
+    s3_plspredict_verdict_label: "Verdict",
+    s3_plspredict_verdict_detail: "k={k}, n={n} observations, PLS beats the LM benchmark on {wins}/{total} indicators.",
+    lbl_plspredict_high: "High predictive power",
+    lbl_plspredict_medium: "Medium predictive power",
+    lbl_plspredict_low: "Low predictive power",
+    lbl_plspredict_none: "No indicators to assess",
+    lbl_plspredict_pls_wins: "PLS wins",
+    lbl_plspredict_lm_wins: "LM wins",
+    th_plspredict_pls_rmse: "PLS RMSE",
+    th_plspredict_pls_mae: "PLS MAE",
+    th_plspredict_lm_rmse: "LM RMSE",
+    th_plspredict_lm_mae: "LM MAE",
+    th_plspredict_result: "Result",
+    s3_ipma_btn: "🎯 IPMA",
+    s3_ipma_hint: "X-axis: Importance (standardized total effect on the target). Y-axis: Performance (average score rescaled to 0–100 from the observed data). Dotted lines: the mean of each — dividing the chart into 4 zones to spot which constructs are worth prioritizing.",
+    s3_ipma_target_label: "Choose the target construct",
+    s3_ipma_title: "IPMA — Target: {target}",
+    th_ipma_importance: "Importance (total effect)",
+    th_ipma_performance: "Performance (0–100)",
+    s3_back_to_model: "← Back to model editing",
+    s3_generating_file: "Generating file…",
+    sens_modal_title: "Sample Size Sensitivity Analysis",
+    sens_modal_hint: "Re-runs the model repeatedly, each time randomly dropping N more observations than the last, until about 20 remain — helps gauge the minimum viable sample size and how stable the results are. The data currently has {n} observations.",
+    sens_modal_step_label: "N — observations dropped per additional step",
+    sens_modal_run: "Run analysis",
+    sens_modal_invalid_step: "N must be a positive integer.",
+    sens_modal_cbsem_pvalue_note: "CB-SEM already gives a p-value for every path at each step/iteration (from its Maximum Likelihood fit) — nothing extra needed.",
+    sens_modal_bootstrap_label: "Also compute p-values / significance (runs Bootstrap at every step/iteration — slower)",
+    sens_modal_n_boot_label: "Bootstrap resamples per step/iteration",
+    sens_modal_bootstrap_hint: "PLS-SEM has no closed-form significance test — enabling this runs an extra Bootstrap at every step/iteration to get a p-value, so it takes noticeably longer than the default.",
+    sens_modal_invalid_n_boot: "The bootstrap count must be an integer >= 100.",
+    sens_mode_label: "Analysis mode",
+    sens_mode_shrink_label: "Shrink sample size (step by step)",
+    sens_mode_resample_label: "Repeated resampling at a fixed size",
+    sens_modal_new_n_label: "New sample size (smaller than the current N)",
+    sens_modal_n_iter_label: "Number of iterations (N)",
+    sens_modal_invalid_new_n: "The new sample size must be an integer, at least {min} and smaller than the current {n} observations.",
+    sens_modal_invalid_n_iter: "The iteration count must be an integer from 20 to 500.",
+    sens_modal_resample_hint: "Keeps the new sample size fixed, draws a random subsample (no replacement) and re-runs the model N times, to see how much R² and each path coefficient actually bounce around across those N draws -- unlike the shrinking mode, which only draws once per step.",
+
+    // --- sensitivity.html (opens in a new tab) ---
+    sens_page_title: "Sample Size Sensitivity Analysis",
+    sens_close_tab: "✕ Close this tab",
+    sens_loading: "Re-running the model at different sample sizes…",
+    sens_no_job: "No analysis request found — open this page from the \"Sample Size Sensitivity\" button on the results page.",
+    sens_failed: "Sensitivity analysis failed.",
+    sens_summary_title: "Overview",
+    sens_summary_text: "Method: {method} · Original data: {n0} observations · Drops N={step} more observations per step · {count} steps ran (n from {minN} to {n0}) · {conv}/{count} steps converged.",
+    sens_r2_chart_title: "R² by sample size (endogenous constructs)",
+    sens_chart_hint: "Hover the chart to see the exact value at each sample size. Red-ringed points = the model did not converge at that sample size.",
+    sens_path_chart_title: "Path coefficients by sample size",
+    sens_pvalue_chart_title: "P-value by sample size",
+    sens_pvalue_chart_hint: "The dashed red line marks the 0.05 threshold. For PLS-SEM, these p-values come from a separate Bootstrap run at each sample size (not the main analysis's own bootstrap), so they can vary slightly between runs.",
+    sens_table_title: "Detailed data table",
+    sens_th_n: "n (observations)",
+    sens_th_converged: "Converged",
+    sens_th_export_row: "Source data",
+    sens_export_row_btn: "⬇ CSV",
+    sens_export_row_hint: "Export the exact original rows (all columns) that were randomly sampled and used to run this particular row, to double-check the result.",
+    sens_export_row_failed: "Could not export the source data for this row.",
+    sens_yes: "Yes",
+    sens_no: "No",
+    sens_axis_n: "n",
+    sens_axis_coef: "Coefficient",
+    sens_axis_pvalue: "P-value",
+    sens_axis_median: "Median",
+    sens_not_converged_short: "not converged",
+    sens_th_iteration: "Iteration",
+    sens_resample_summary_text: "Method: {method} · Original data: {n0} observations · Fixed new sample size: {newN} · Iterations: {nIter} · {conv}/{nIter} converged.",
+    sens_resample_r2_chart_title: "R² distribution across {n} resamples (n = {newN})",
+    sens_resample_path_chart_title: "Path coefficient distribution across {n} resamples (n = {newN})",
+    sens_resample_chart_hint: "Each box is one construct/path's distribution across every iteration: the middle line is the median, the box spans the IQR (Q1-Q3), whiskers reach the most extreme value within 1.5x IQR, and separate dots are outliers. Hover a box for the exact numbers.",
+    sens_resample_chart_hint_line: "Each line is one construct/path across iterations (x-axis = iteration). Hover the chart to see the exact value at each iteration. Red-ringed points = the model did not converge at that iteration.",
+    sens_resample_pvalue_chart_title: "p-value distribution across {n} resamples (n = {newN})",
+    sens_resample_pvalue_chart_hint: "The dashed red line marks the 0.05 threshold. Each box is one path's p-value distribution across every iteration (each iteration runs its own Bootstrap to compute that iteration's p-value).",
+    sens_resample_pvalue_chart_hint_line: "The dashed red line marks the 0.05 threshold. Each line is one path's p-value across iterations (each iteration runs its own Bootstrap to compute that iteration's p-value).",
+    sens_chart_type_box: "📦 Box plot",
+    sens_chart_type_line: "📈 Line chart",
+    sens_guide_section_title: "Reading Guide & What the Numbers Mean",
+    sens_guide_what_summary: "What is Sample Size Sensitivity?",
+    sens_guide_what_body:
+      "<p>Checks how stable the estimates (R², path coefficients) are as the <strong>real</strong> sample size shrinks — by randomly dropping observations from the data you actually uploaded and re-running the model repeatedly. It answers: <strong>\"If I had less data, would my results still be stable / would the model still converge?\"</strong></p>" +
+      "<p>This tool is useful for gauging how sensitive your current results are to sample size — <strong>not</strong> for computing the probability of detecting an effect or determining how much data to collect before surveying (that's what <em>Power Analysis</em> is for — it simulates entirely new data from a hypothesized population model, fundamentally different from progressively dropping real data here).</p>",
+    sens_guide_read_summary: "How to read the chart & table",
+    sens_guide_read_body:
+      "<ul>" +
+      "<li><strong>X-axis (n):</strong> the sample size at each step, decreasing from the original total observation count.</li>" +
+      "<li><strong>R² chart:</strong> how each endogenous construct's R² changes as sample size shrinks.</li>" +
+      "<li><strong>Path Coefficients chart:</strong> how each structural path coefficient changes as sample size shrinks.</li>" +
+      "<li><strong>P-value chart</strong> (when enabled): each path's p-value at every sample size, dashed red line at 0.05. Always available for CB-SEM (free, straight from the ML fit); for PLS-SEM only when the Bootstrap option was enabled in the config dialog, since it needs its own extra bootstrap run at every sample size.</li>" +
+      "<li><strong>Red-ringed points:</strong> the model didn't converge at that sample size — a sign the sample has become too small for stable estimation.</li>" +
+      "<li><strong>Detailed table:</strong> every sample size tested, whether it converged, and the corresponding R² and path coefficients (and p-value if available) at that point.</li>" +
+      "</ul>",
+    sens_guide_limits_summary: "Limitations",
+    sens_guide_limits_body:
+      "<ul>" +
+      "<li>Each sample size is subsampled just <strong>once</strong> (not repeated many times like a Monte Carlo simulation), so some of the fluctuation between neighboring points comes from that single draw's own sampling noise rather than a genuine trend. To address exactly this, use the \"Repeated resampling at a fixed size\" mode below.</li>" +
+      "<li>This analyzes data you already have — it doesn't tell you how much data you <strong>should</strong> collect before surveying; for that, use Power Analysis on the results page.</li>" +
+      "</ul>",
+    sens_guide_resample_summary: "What is \"Repeated resampling at a fixed size\"?",
+    sens_guide_resample_body:
+      "<p>Instead of shrinking the sample size and subsampling just <strong>once</strong> per step, this mode holds a smaller sample size you choose <strong>fixed</strong>, then draws a random subsample (no replacement) and re-runs the model <strong>many times</strong> (N times) at that exact size -- a genuine Monte-Carlo-style simulation on your own data.</p>" +
+      "<p>The result is a box plot for R² and for each path coefficient, showing how much those estimates actually bounce around (median, IQR, min-max, and outliers) across the N draws -- answering <strong>\"If I only had that many observations, how stable would my estimates be?\"</strong> far more precisely than a single point ever could.</p>",
+
+    // --- power_analysis.html (opens in a new tab) ---
+    power_page_title: "Statistical Power Analysis",
+    power_loading: "Running the Monte Carlo simulation — this may take a while…",
+    power_no_job: "No analysis request found — open this page from the \"Power Analysis\" button on the results page.",
+    power_failed: "Power analysis failed.",
+    power_summary_title: "Overview",
+    power_method_hint: "Each simulated point: generate a synthetic dataset from the declared population model (expected path coefficients & loadings), fit PLS-SEM + Bootstrap, then compute the fraction of converged replicates where the path came out significant (p < 0.05). Assumes exogenous constructs are mutually independent (Aguirre-Urreta & Rönkkö, 2015).",
+    power_summary_text_pls: "{nPaths} paths · {nSizes} sample sizes tested · {nMc} Monte Carlo replicates/size · {nBoot} bootstrap resamples/replicate · Minimum n reaching 80% power: {minN}.",
+    power_summary_text_cbsem: "{nPaths} paths · {nSizes} sample sizes tested · {nMc} Monte Carlo replicates/size · significance computed directly (z-test, no bootstrap needed) · Minimum n reaching 80% power: {minN}.",
+    power_chart_title: "Power curve by sample size",
+    power_chart_hint: "Hover the chart for exact values. The dashed horizontal line marks the conventional 80% threshold. Click a legend entry to show/hide that line.",
+    power_table_title: "Detailed data table",
+    power_not_reached: "not reached",
+    power_axis_n: "n",
+    power_axis_power: "Power (%)",
+    power_th_n: "n (observations)",
+    power_th_path: "Path",
+    power_th_power: "Power",
+    power_th_converged: "Converged / Total replicates",
+    power_th_mean_estimate: "Mean estimated coefficient",
+    power_modal_title: "Configure Power Analysis",
+    power_modal_hint: "Declare the expected path coefficients and loadings (the population model), then choose the sample-size range to test. Defaults are prefilled from your last analysis (editable).",
+    power_modal_paths_title: "Expected path coefficients",
+    power_modal_loadings_title: "Expected loadings (average per construct)",
+    power_modal_range_title: "Sample-size range",
+    power_modal_from: "From",
+    power_modal_to: "To",
+    power_modal_step: "Step",
+    power_modal_advanced: "Advanced options",
+    power_modal_n_mc: "Monte Carlo replicates / sample size",
+    power_modal_n_boot: "Bootstrap resamples / replicate",
+    power_modal_n_mc_hint: "Higher = a smoother curve, but slower.",
+    power_modal_estimate: "Estimated runtime: ~{sec}s ({points} sample sizes × {mc} replicates).",
+    power_modal_run: "Run simulation",
+    power_modal_invalid: "Please check the values entered (positive numbers, a valid sample-size range).",
+    power_btn_disabled_hint: "Power Analysis only supports reflective (Mode A) models with no moderation/interaction construct.",
+    power_guide_section_title: "Reading Guide & What the Numbers Mean",
+    power_guide_what_summary: "What is Power Analysis, and when should I use it?",
+    power_guide_what_body:
+      "<p>Power Analysis (under H₁) answers: <strong>\"If the true population effect equals what I expect, what's the probability that a sample of size n would let me detect it?\"</strong> It's meant to be used <strong>before</strong> collecting data, to estimate the minimum sample size worth surveying — unlike most other PLS-SEM analyses, which only apply once you already have real data.</p>" +
+      "<p>Because PLS-SEM has no closed-form power formula, this tool uses Monte Carlo simulation: it generates many synthetic datasets from the population model you declare, runs a real PLS-SEM + Bootstrap fit on each one, and counts how often the effect comes out detected.</p>" +
+      "<p>This page is shared by both PLS-SEM and CB-SEM. For <strong>CB-SEM</strong>, significance is computed directly via a z-test (Wald test) from the Maximum Likelihood estimate — no bootstrap needed — so each replicate costs just one fit, much faster than PLS-SEM (which needs an extra bootstrap loop inside every replicate).</p>" +
+      "<p><strong>How this differs from Sample Size Sensitivity:</strong> Sensitivity takes your real, already-collected data and progressively drops observations — answering \"how stable are my current results if I'd had less data?\" Power Analysis simulates entirely new data from a hypothesized population model — answering \"how much data do I need to collect?\" The two tools complement each other rather than replace one another.</p>",
+    power_guide_read_summary: "How to read the chart & table",
+    power_guide_read_body:
+      "<ul>" +
+      "<li><strong>X-axis (n):</strong> the sample size being tested.</li>" +
+      "<li><strong>Y-axis (Power %):</strong> the percentage of simulation replicates in which that path came out statistically significant (p &lt; 0.05), out of every replicate where PLS converged at that sample size.</li>" +
+      "<li><strong>The dashed horizontal line at 80%:</strong> the conventional \"adequately powered\" threshold (Cohen, 1988) — the sample size where a path's curve crosses this line is a reasonable minimum to collect for that path.</li>" +
+      "<li>Each line in the chart is one structural path — click a legend entry to show/hide it.</li>" +
+      "<li><strong>\"Converged / Total replicates\":</strong> how many replicates converged out of the total simulated at that sample size. An unusually low convergence rate (typically at very small n) means the power estimate at that point is less reliable.</li>" +
+      "<li><strong>\"Mean estimated coefficient\":</strong> the average estimated path coefficient across converged replicates — it should sit close to the population value you declared; a large gap can reflect PLS's known tendency to attenuate path coefficients with few indicators per block.</li>" +
+      "</ul>",
+    power_guide_limits_summary: "Assumptions & limitations",
+    power_guide_limits_body:
+      "<ul>" +
+      "<li>Only supports reflective (Mode A) constructs; formative (Mode B) constructs and models with a moderation/interaction construct aren't supported yet.</li>" +
+      "<li>Assumes exogenous constructs are mutually independent (Aguirre-Urreta & Rönkkö, 2015) — if the real population has strongly correlated exogenous variables, results can be biased.</li>" +
+      "<li>Each construct uses a single average loading applied to all of its indicators, rather than a value per indicator.</li>" +
+      "<li>Results depend entirely on the expected path coefficients/loadings you declare — this is a simulation under your assumptions, not \"the truth\". Try a few scenarios (optimistic/conservative) for a fuller picture.</li>" +
+      "<li>Fewer Monte Carlo replicates means a noisier curve (more random sampling fluctuation) — raise the count for a smoother curve at the cost of a longer run.</li>" +
+      "</ul>",
+
+    // --- ML comparison page ---
+    ml_page_title: "Machine Learning Comparison",
+    ml_loading: "Training the selected Machine Learning algorithms — this may take a moment…",
+    ml_no_job: "No analysis request found — open this page from the \"ML Comparison\" button on the results page.",
+    ml_failed: "ML Comparison failed.",
+    ml_summary_title: "Overview",
+    ml_summary_text: "{method} · {nTargets} endogenous constructs · {nAlgos} algorithms selected · k-fold cross-validation with k={k}.",
+    ml_method_hint: "For every endogenous construct (with at least one incoming path), its direct predecessor constructs (exactly as in the structural model) are used as input features to train each selected algorithm, evaluated via k-fold cross-validation. The feature importance shown in the comparison section is permutation importance — the one measure that's fairly comparable across linear coefficients, decision-tree splits, and SVM margins.",
+    ml_comparison_title: "Comparison: SEM Path Coefficients vs. ML Feature Importance",
+    ml_comparison_hint: "Each row is one (target, predictor) pair — a flat table, no merged cells. The \"SEM\" column is the standardized path coefficient from the structural model; the algorithm columns are permutation importance. See the charts below for the same figures visualized.",
+    ml_charts_title: "Comparison Charts by Target",
+    ml_charts_hint: "Each chart corresponds to one endogenous construct (target), normalized 0–1 within that target for easier comparison between algorithms. Click a name in the legend to hide/show that algorithm on every chart.",
+    ml_detail_title: "Per-Algorithm Detail",
+    ml_detail_hint: "Fit metrics (R²/RMSE for regressors, Accuracy/AUC for Logistic Regression) and the full importance ranking — both the algorithm's own \"native\" importance (regression coefficient or feature_importances_) and permutation importance.",
+    ml_th_predictor: "Predictor",
+    ml_th_sem_coef: "SEM (path coef.)",
+    ml_th_target: "Target",
+    ml_th_accuracy: "Accuracy",
+    ml_th_auc: "AUC",
+    ml_th_native_importance: "Native Importance",
+    ml_th_permutation_importance: "Permutation Importance",
+    ml_tooltip_normalized: "normalized",
+    ml_badge_regression: "Regression",
+    ml_badge_classification: "Classification",
+    ml_algo_linreg: "Linear Regression",
+    ml_algo_logreg: "Logistic Regression",
+    ml_algo_dtree: "Decision Tree",
+    ml_algo_rf: "Random Forest",
+    ml_algo_svm: "Support Vector Machine (SVM)",
+    ml_algo_gbm: "Gradient Boosting (GBM)",
+    ml_algo_xgboost: "XGBoost",
+    ml_algo_lightgbm: "LightGBM",
+    ml_algo_catboost: "CatBoost",
+    ml_guide_section_title: "How to Read This & What the Numbers Mean",
+    ml_guide_what_summary: "What is the ML Comparison?",
+    ml_guide_what_body:
+      "<p>This tool re-runs the exact dataset you used for SEM, but instead of the structural (path) model, each endogenous construct is predicted using Machine Learning algorithms — from simple linear/logistic regression to tree and boosting models (Random Forest, GBM, XGBoost, LightGBM, CatBoost). The goal is a cross-check: are the predictors the SEM model considers important (large path coefficients) actually the \"most important\" ones from Machine Learning's purely data-driven point of view?</p>" +
+      "<p><strong>This is not a statistical test that replaces SEM</strong> — SEM estimates a pre-specified theoretical model (confirmatory), while the Machine Learning here only optimizes predictive accuracy (predictive), with no hypothesis testing. Agreement between the two approaches strengthens confidence in a finding; disagreement is a prompt for further scrutiny, not proof the SEM model is \"wrong\".</p>",
+    ml_guide_logreg_summary: "Why does Logistic Regression report Accuracy/AUC instead of R²?",
+    ml_guide_logreg_body:
+      "<p>A construct score in SEM is a continuous variable, while Logistic Regression is a classification algorithm — it can only predict a 0/1 label, not a continuous value. So the target (y) is converted to 0/1 using the following rule, applied <strong>separately within each k-fold cross-validation fold</strong>:</p>" +
+      "<ol>" +
+      "<li>Compute the median of y <strong>using only that fold's training data</strong> — never the test fold, to avoid data leakage.</li>" +
+      "<li>For every observation (in both the training and test fold): <code>y_binary = 1</code> if <code>y &gt; training_fold_median</code> (the \"High\" group), otherwise <code>y_binary = 0</code> (the \"Low\" group).</li>" +
+      "<li>Logistic Regression is trained and evaluated on this <code>y_binary</code>, not on the original continuous score.</li>" +
+      "</ol>" +
+      "<p>Because the median threshold is recomputed per fold, its exact value can differ slightly from one fold to the next — that's a normal feature of k-fold cross-validation, not a bug. Since the task itself changed from regression to classification, the evaluation metrics change accordingly: Accuracy (fraction of correctly classified observations) and AUC (how well the two 0/1 groups are separated), instead of the R²/RMSE used by every other, regression-based algorithm.</p>",
+    ml_logreg_inline_note: "The target was converted to 0/1: y = 1 (\"High\") if above that fold's training-set median, otherwise y = 0 (\"Low\"). See \"Why does Logistic Regression report Accuracy/AUC instead of R²?\" in the guide below for the full rule.",
+    ml_guide_limits_summary: "Limitations",
+    ml_guide_limits_body:
+      "<ul>" +
+      "<li>Inputs are construct scores/factor scores, not the raw indicators — so \"feature importance\" here is at the construct level, corresponding directly to the SEM path coefficients, not the importance of individual survey items.</li>" +
+      "<li>With small samples, more complex algorithms (Random Forest, boosting) overfit more easily than linear regression — a negative test-fold R² is a normal sign of limited data, not necessarily a bug.</li>" +
+      "<li>SVM has no \"native\" importance (its default kernel isn't linear) — only permutation importance is shown for it.</li>" +
+      "<li>Logistic Regression's median split discards information relative to the original continuous variable — treat it as a complementary view, not a replacement for a full regression analysis.</li>" +
+      "</ul>",
+    ml_modal_title: "Configure ML Comparison",
+    ml_modal_loading_algorithms: "Loading available algorithms…",
+    ml_modal_load_failed: "Couldn't load the algorithm list. Please try again.",
+    ml_modal_hint: "Choose which algorithms to run — each is evaluated via k-fold cross-validation on the same data used for SEM.",
+    ml_group_linear: "Linear / logistic regression",
+    ml_group_tree: "Decision trees & ensembles",
+    ml_group_boosting: "Gradient boosting",
+    ml_modal_unavailable: "unavailable",
+    ml_modal_unavailable_hint: "This algorithm's library isn't installed on the server.",
+    ml_modal_k_label: "Number of folds (k) for cross-validation",
+    ml_modal_k_hint: "Higher = more stable estimates but a longer run, especially for Random Forest/CatBoost.",
+    ml_modal_select_at_least_one: "Please select at least one algorithm.",
+    ml_modal_invalid_k: "The number of folds (k) must be between 2 and 10.",
+
+    mga_modal_title: "Configure Multi-Group Comparison (PLS-MGA)",
+    mga_modal_loading: "Looking for columns that can split respondents into groups…",
+    mga_modal_no_candidates: "No suitable grouping column found (needs a column with 2-15 distinct values that isn't a model indicator).",
+    mga_modal_hint: "Pick a column to split respondents into two groups, then choose which values belong to each group. Compares path coefficients between the two groups using 3 methods: Parametric/Welch-Satterthwaite, Permutation test, and PLS-MGA (Henseler).",
+    mga_modal_column_label: "Grouping column",
+    mga_modal_group_a_title: "Group A",
+    mga_modal_group_b_title: "Group B",
+    mga_modal_label_placeholder_a: "Display name for Group A (optional)",
+    mga_modal_label_placeholder_b: "Display name for Group B (optional)",
+    mga_modal_value_used_by_other_group: "This value already belongs to the other group.",
+    mga_modal_n_boot_label: "Bootstrap resamples per group",
+    mga_modal_n_perm_label: "Permutations",
+    mga_modal_settings_hint: "From 100 to 5000. Higher gives more stable results but takes longer to run.",
+    mga_modal_select_values: "Please select at least one value for each group.",
+    mga_modal_invalid_settings: "Bootstrap/permutation count must be between 100 and 5000.",
+
+    mga_page_title: "Multi-Group Comparison (PLS-MGA)",
+    mga_loading: "Running bootstrap and permutation for each group — this may take a moment…",
+    mga_no_job: "No multi-group comparison request found — please reopen this from the results page.",
+    mga_failed: "Multi-group comparison failed.",
+    mga_summary_title: "Overview",
+    mga_summary_text: "Grouped by \"{column}\": {labelA} (n={nA}) vs. {labelB} (n={nB}). Bootstrap: {nBoot} per group, Permutation: {nPerm}.",
+    mga_table_title: "Path coefficient comparison between the two groups",
+    mga_table_hint: "Each row is one structural path. A small p-value (< 0.05) on Parametric/Welch-Satterthwaite/Permutation, or p-MGA < 0.05 or > 0.95, indicates the path coefficient differs significantly between {labelA} and {labelB}.",
+    mga_col_path: "Path",
+    mga_col_coef_a: "Coefficient",
+    mga_col_coef_b: "Coefficient",
+    mga_col_diff: "Difference",
+    mga_col_p_parametric: "p (Parametric)",
+    mga_col_p_welch: "p (Welch-Satterthwaite)",
+    mga_col_p_permutation: "p (Permutation)",
+    mga_col_p_mga: "p (PLS-MGA)",
+    mga_col_significant: "Conclusion",
+    mga_significant: "Significantly different",
+    mga_not_significant: "Not significantly different",
+    mga_guide_section_title: "Reading Guide & What the Numbers Mean",
+    mga_guide_what_summary: "What is PLS-MGA (Multi-Group Analysis)?",
+    mga_guide_what_body:
+      "<p>Tests whether a structural path's coefficient differs significantly between two groups of respondents (e.g. Male vs. Female, Condition A vs. B). This is a separate analysis step, run AFTER the model has already been estimated in Step 3 -- using the exact same data and model.</p>",
+    mga_guide_methods_summary: "What the three significance tests mean",
+    mga_guide_methods_body:
+      "<ul>" +
+      "<li><strong>Parametric test (Chin, 2000)</strong> and <strong>Welch-Satterthwaite</strong>: classic t-tests built from each group's bootstrap standard deviation. Parametric assumes equal variance between the two groups; Welch-Satterthwaite doesn't (usually more trustworthy when the two groups' sample sizes differ).</li>" +
+      "<li><strong>Permutation test (Chin &amp; Dibbern, 2010)</strong>: non-parametric -- randomly reshuffles all respondents and re-splits them into two groups of the original sizes, repeated many times to build a \"no real difference\" null distribution, from which the p-value is computed.</li>" +
+      "<li><strong>PLS-MGA (Henseler, Ringle &amp; Sinkovics, 2009)</strong>: non-parametric -- directly compares the two groups' entire bootstrap distributions of the path coefficient (without first reducing to a standard error). Significant at the 5% level when p &lt; 0.05 OR p &gt; 0.95 (this asymmetric threshold, not p &lt; 0.025, is the method's own standard convention).</li>" +
+      "</ul>" +
+      "<p>The methods usually agree; when they don't, report all three and favor Welch-Satterthwaite or PLS-MGA as the primary result (fewer assumptions).</p>",
+    mga_guide_limits_summary: "Limitations",
+    mga_guide_limits_body:
+      "<ul>" +
+      "<li>Interaction/moderation constructs are only supported when using the Two-Stage method -- Product Indicator and Orthogonalization aren't supported.</li>" +
+      "<li>Each group needs at least 30 valid observations for the bootstrap/permutation results to be stable enough.</li>" +
+      "<li>Results only compare EXACTLY 2 groups per run -- for a grouping variable with more than 2 values, fold the remaining values into one of the two groups, or rerun separately for each pair of groups you want to compare.</li>" +
+      "</ul>",
+
+    // --- AI report (shared modal + standalone page) ---
+    s3_ai_report_btn: "🤖 AI Report",
+    ai_modal_title: "Generate a Report with AI",
+    ai_modal_provider_label: "AI Provider",
+    ai_modal_api_key_label: "Your API key",
+    ai_modal_api_key_hint: "The key is sent to this app's own server to relay this one request to {provider} — it is never stored or logged server-side.",
+    ai_modal_storage_error: "Couldn't save the request (possibly because the attached charts are too large) — please try again.",
+    ai_modal_remember_key: "Remember this key in this browser (localStorage)",
+    ai_modal_model_label: "Model",
+    ai_modal_model_hint: "These are just suggestions, not a limit — you can type any model name your account has access to.",
+    ai_modal_temperature_label: "Creativity (temperature)",
+    ai_modal_temperature_low: "Precise",
+    ai_modal_temperature_high: "Creative",
+    ai_modal_temperature_hint: "Lower = tighter, more consistent wording that sticks close to the data; higher = more freedom for the AI to phrase things and reason more expansively. Defaults to 1.0 (maximum).",
+    ai_modal_length_label: "Report length",
+    ai_modal_length_short: "Short",
+    ai_modal_length_medium: "Medium",
+    ai_modal_length_long: "Long & thorough",
+    ai_modal_options_label: "Include in the report",
+    ai_modal_opt_tables: "Summary tables",
+    ai_modal_opt_interpretation: "In-depth interpretation & inference",
+    ai_modal_opt_recommendations: "Recommendations / managerial implications",
+    ai_modal_opt_limitations: "Limitations & future research directions",
+    ai_modal_prompt_label: "Prompt for the report (editable)",
+    ai_modal_run: "Generate Report",
+    ai_modal_invalid_key: "Please enter your OpenAI API key.",
+    ai_modal_invalid_prompt: "Please enter a prompt for the report.",
+    ai_modal_prompt_default_sem: "Write a full, coherent academic report based on the SEM results above: describe the model, interpret the path coefficients and measurement indices, draw conclusions about the research hypotheses, and suggest theoretical/managerial implications.",
+    ai_modal_prompt_default_sensitivity: "Write a report on the sample size sensitivity analysis above: comment on the trend of R² (and p-values, if present) as the sample size shrinks, assess the model's stability, and recommend a minimum sample size.",
+    ai_modal_prompt_default_power: "Write a report on the Power Analysis above: interpret power for each path and sample size, identify which paths need a larger sample to reach adequate power (≥ 0.8), and recommend a sample size for the study.",
+    ai_modal_prompt_default_mlcompare: "Write a report comparing the SEM path coefficients against the Machine Learning algorithms' feature importance above: comment on the agreement/disagreement between the two approaches, and conclude on the reliability of the structural model.",
+    ai_page_title: "AI Report",
+    ai_loading: "Generating the report with AI — a \"Long & thorough\" report can take 1-3 minutes, sometimes longer…",
+    ai_no_job: "No request found — open this page from the \"AI Report\" button on the results page.",
+    ai_failed: "Failed to generate the report.",
+    ai_generated_from: "Generated from:",
+    ai_your_prompt: "Your prompt:",
+    ai_image_path_diagram: "Path Diagram",
+    ai_image_simple_slopes: "Simple Slopes chart",
+    ai_image_power_chart: "Power curve chart",
+    ai_image_ml_chart: "Comparison chart — {target}",
+
+    s3_export_failed: "Failed to export the report.",
+    s3_loading_pls_boot: "Estimating the model and running Bootstrapping ({n} resamples — may take up to a minute)…",
+    s3_loading_pls: "Estimating the model…",
+    s3_loading_cbsem: "Estimating CB-SEM (Maximum Likelihood)…",
+    s3_analyze_failed: "Analysis failed.",
+
+    s3_reliability_title: "Reliability & Convergent Validity (Reflective)",
+    s3_loadings_title: "Outer Loadings",
+    s3_cross_loadings_title: "Cross Loadings",
+    s3_cross_loadings_hint: "Each indicator should load highest on its own construct.",
+    s3_fl_title: "Discriminant Validity — Fornell-Larcker",
+    s3_htmt_title: "Discriminant Validity — HTMT",
+    s3_path_title: "Structural Model — Path Coefficients & f²",
+    s3_total_effects_title: "Total & Indirect Effects (Mediation Testing)",
+    s3_total_effects_hint: "Indirect effect = sum of the products of path coefficients along every route through a mediator construct; total effect = direct + indirect.",
+    s3_specific_indirect_title: "Specific Indirect Effects",
+    s3_specific_indirect_hint: "Each row is one specific mediated route — unlike the Total & Indirect Effects table, which sums every route between a construct pair. When bootstrapping was run, significance is tested directly on that same per-resample product.",
+    s3_moderated_mediation_title: "Index of Moderated Mediation (Hayes, 2015)",
+    s3_moderated_mediation_hint: "Measures how much the indirect effect changes per one-unit increase in the moderator — for mediated routes with exactly one moderated edge. When bootstrapping was run, significance is tested directly on this index across resamples.",
+    s3_moderated_mediation_hint_cbsem: "Measures how much the indirect effect changes per one-unit increase in the moderator — for mediated routes with exactly one moderated edge. For CB-SEM this is a point estimate only, without its own significance test yet.",
+    s3_r2q2_title: "R² & Q² of Endogenous Constructs (Predictive Relevance)",
+    s3_vif_title: "Collinearity (VIF)",
+    s3_cmb_title: "Common Method Bias — Full Collinearity Test",
+    s3_cmb_hint: "Each construct is regressed on ALL other constructs (not just direct predictors) — the WarpPLS technique (Kock, 2015). Every VIF <= {threshold} means the model shows no sign of CMB.",
+    s3_bootstrap_dist_title: "Bootstrap Distributions by Path Coefficient",
+    s3_bootstrap_dist_hint: "Distribution of {n} valid bootstrap samples for each path coefficient. Solid blue line = original estimate; dashed red lines = 95% confidence interval.",
+    lbl_bootstrap_hist_stats: "Original: {orig} · 95% CI: [{lo}, {hi}]",
+    s3_slopes_title: "Simple Slopes Chart",
+    s3_slopes_hint: "The relationship between the independent variable and the outcome at three levels of the moderator (−1SD, Mean, +1SD), computed from this run's own standardized path coefficients (Aiken & West, 1991). Click \"⇄\" to swap axes.",
+    s3_slopes_swap: "Swap axes",
+    s3_slopes_low: "{name} at −1 SD",
+    s3_slopes_mean: "{name} at Mean",
+    s3_slopes_high: "{name} at +1 SD",
+
+    cbsem_fit_title: "Model Fit",
+    cbsem_reliability_title: "Reliability & Convergent Validity",
+    cbsem_loadings_title: "Factor Loadings",
+    cbsem_path_title: "Structural Model — Path Coefficients",
+    cbsem_r2_title: "R² of Endogenous Constructs",
+    cbsem_r2_hint: "Corrected for measurement error — typically higher than PLS-SEM's R² on the same data.",
+
+    conv_converged: "Converged",
+    conv_not_converged: "NOT converged",
+    conv_after_iterations: "after {n} iterations",
+    conv_n_obs: "n = {n} valid observations.",
+    conv_bootstrap: "Bootstrapping: {valid}/{requested} valid samples.",
+    conv_cbsem_after: "({msg}) after {n} iterations",
+
+    th_construct: "Construct",
+    th_endogenous_construct: "Endogenous Construct",
+    th_indicator: "Indicator",
+    th_outer_loading: "Outer Loading",
+    th_outer_weight: "Outer Weight",
+    th_stdev: "STDEV",
+    th_t_stat: "T Statistics",
+    th_p_value: "P Values",
+    th_significance: "Significance (95%)",
+    th_note: "Note",
+    th_path: "Path",
+    th_path_coefficient: "Path Coefficient (β)",
+    th_direct_effect: "Direct Effect",
+    th_indirect_effect: "Indirect Effect",
+    th_total_effect: "Total Effect",
+    th_moderator: "Moderator",
+    th_mm_index: "Index",
+    th_f_squared: "f²",
+    th_f2_effect: "f² Effect Size",
+    th_r2: "R²",
+    th_r2_adj: "Adjusted R²",
+    th_r2_assessment: "R² Assessment",
+    th_q2: "Q² (blindfolding, D={d})",
+    th_q2_assessment: "Q² Assessment",
+    th_pair: "Pair",
+    th_vif: "VIF",
+    th_assessment: "Assessment",
+    th_cronbachs_alpha: "Cronbach's α",
+    th_rho_a: "rho_A",
+    th_composite_reliability: "Composite Reliability",
+    th_ave: "AVE",
+    th_unstd: "Unstd.",
+    th_std_lambda: "Std. (λ)",
+    th_std_beta: "Std. (β)",
+    th_unstd_b: "Unstd. (B)",
+    th_se: "SE",
+    th_z: "z",
+    th_p: "p",
+    th_fit_index: "Index",
+    th_value: "Value",
+
+    lbl_dash: "—",
+    eta_remaining: "Estimated time remaining: ~{s}s",
+    eta_almost_done: "Almost done, finishing up…",
+    lbl_r2_weak: "Weak",
+    lbl_r2_moderate: "Moderate",
+    lbl_r2_substantial: "Substantial",
+    lbl_r2_strong: "Strong",
+    lbl_f2_none: "Negligible",
+    lbl_f2_small: "Small",
+    lbl_f2_medium: "Medium",
+    lbl_f2_large: "Large",
+    lbl_moderation_badge: "Moderation",
+    lbl_htmt_good: "< {v} — discriminant validity holds",
+    lbl_htmt_warn: "{a}–{b} — borderline, worth a closer look",
+    lbl_htmt_critical: "≥ {v} — may violate discriminant validity",
+
+    // --- computation transparency section ---
+    src_transparency_title: "Computation Transparency",
+    src_transparency_hint: "The actual Python source that ran to produce the results above, pulled straight from the code currently running on the server (not a hand-copied version).",
+    src_section_core_algorithm: "Core estimation algorithm",
+    src_section_measurement_metrics: "Reliability & convergent/discriminant validity (rho_A, CR, AVE, HTMT, f²)",
+    src_section_cmb: "Common Method Bias (Full Collinearity VIF)",
+    src_section_mediation: "Mediation (Total & Indirect Effects)",
+    src_section_moderation: "Moderation",
+    src_section_bootstrap: "Bootstrapping (significance testing)",
+    src_section_blindfolding: "Blindfolding (Q² — predictive relevance)",
+    src_section_ml_engine: "k-fold loop & permutation importance (ml_compare/engine.py)",
+    src_section_ml_algorithms: "Selected algorithms' construction (ml_compare/registry.py)",
+
+    // --- results reading guide (bottom of PLS-SEM / CB-SEM results pages) ---
+    results_guide_section_title: "Reading Guide & What the Numbers Mean",
+    results_guide_measurement_summary: "Measurement Model (Outer Model)",
+    results_guide_measurement_body:
+      "<ul>" +
+      "<li><strong>Outer Loadings:</strong> the correlation between each indicator and the construct it belongs to. For reflective constructs, aim for ≥0.7; 0.4–0.7 can be considered for removal if dropping it doesn't hurt AVE/reliability. <strong>Cross Loadings</strong> should show each indicator loading highest on its own construct, not another one.</li>" +
+      "<li><strong>Cronbach's Alpha, rho_A, Composite Reliability (CR):</strong> internal consistency reliability — ≥0.7 is generally considered acceptable (0.6–0.7 can be acceptable in exploratory research).</li>" +
+      "<li><strong>AVE (Average Variance Extracted):</strong> convergent validity — should be ≥0.5 (the construct explains at least 50% of the variance of its own indicators).</li>" +
+      "</ul>",
+    results_guide_discriminant_summary: "Discriminant Validity",
+    results_guide_discriminant_body:
+      "<ul>" +
+      "<li><strong>Fornell-Larcker:</strong> the square root of AVE on the diagonal should exceed that construct's correlation with any other construct.</li>" +
+      "<li><strong>HTMT (Heterotrait-Monotrait Ratio):</strong> should be &lt;0.85 (stricter) or &lt;0.90 (when constructs are conceptually close), per Henseler et al. (2015); ≥0.90 signals a discriminant validity violation.</li>" +
+      "</ul>",
+    results_guide_structural_summary: "Structural Model — Path Coefficients",
+    results_guide_structural_body:
+      "<ul>" +
+      "<li><strong>Path coefficient (standardized β):</strong> its sign (+/−) and magnitude show the direction and strength of the relationship between two constructs.</li>" +
+      "<li>If <strong>Bootstrapping</strong> was enabled: the STDEV / T-Statistics / P-Values / Significance columns show a path is statistically significant when p &lt; 0.05 (equivalent to |T| &gt; 1.96 for a two-tailed test).</li>" +
+      "<li><strong>f² (effect size):</strong> &lt;0.02 negligible, 0.02–0.15 small, 0.15–0.35 medium, ≥0.35 large (Cohen, 1988). A path from a moderation (interaction) construct uses much smaller thresholds instead: 0.005/0.01/0.025 (Kenny 2018; Aguinis et al. 2005).</li>" +
+      "</ul>",
+    results_guide_mediation_summary: "Mediation Effects",
+    results_guide_mediation_body:
+      "<ul>" +
+      "<li><strong>Total &amp; Indirect Effects:</strong> the indirect effect is the sum of the products of path coefficients along <em>every</em> route through a mediator between a pair of constructs; the total effect is direct + indirect.</li>" +
+      "<li><strong>Specific Indirect Effects:</strong> breaks out <em>each individual</em> mediated route (instead of summing them as in the table above) — when bootstrapped, each route also gets its own significance test, based on that route's product within the same resample.</li>" +
+      "<li><strong>Index of Moderated Mediation (Hayes, 2015):</strong> appears only when the model has both a mediator and a moderator acting on exactly one segment of that mediated route (PROCESS Model 7/14 shape). This index is the <em>slope</em> of the indirect effect with respect to the moderator — how much the indirect effect changes per one-unit increase in the moderator. A 95% CI that excludes 0 means the moderation of the indirect effect is itself statistically significant — a more rigorous test than just comparing \"significant in one group but not the other\".</li>" +
+      "</ul>",
+    results_guide_predictive_summary: "R², Q² & Collinearity (VIF)",
+    results_guide_predictive_body:
+      "<ul>" +
+      "<li><strong>R²:</strong> 0.19 weak, 0.33 moderate, 0.67 substantial (Chin, 1998) — reference thresholds only, field-dependent.</li>" +
+      "<li><strong>Q² (Predictive Relevance, from Blindfolding):</strong> &gt;0 means the model has out-of-sample predictive power for that construct; ≤0 means it doesn't.</li>" +
+      "<li><strong>VIF (Inner/Outer):</strong> should be &lt;3.3 (or &lt;5 under a more lenient rule) to avoid collinearity distorting the estimated coefficients.</li>" +
+      "</ul>",
+    results_guide_cmb_summary: "Common Method Bias",
+    results_guide_cmb_body:
+      "<p>Full collinearity VIF (Kock, 2015): each construct is regressed on <strong>every</strong> other construct in the model, not just its direct predictors. VIF ≤ threshold (default 3.3) means no meaningful sign of common method bias.</p>",
+    results_guide_slopes_summary: "Simple Slopes (when a moderator is present)",
+    results_guide_slopes_body:
+      "<p>Three lines at −1SD / Mean / +1SD of the moderator show how the relationship between the independent variable and the outcome changes across levels of the moderator (Aiken &amp; West, 1991). The more the three lines fan apart (non-parallel), the stronger the interaction; near-parallel lines mean a weak interaction, regardless of whether the interaction path itself is statistically significant.</p>",
+    results_guide_bootstrap_dist_summary: "Bootstrap Distributions (when Bootstrapping was enabled)",
+    results_guide_bootstrap_dist_body:
+      "<p>Each chart is the distribution of one path coefficient across every bootstrap resample. The solid blue line is the original estimate; the dashed red lines mark the 95% (percentile) confidence interval. If the 95% CI doesn't contain 0, that path is statistically significant.</p>",
+    cbsem_guide_fit_summary: "Model Fit",
+    cbsem_guide_fit_body:
+      "<ul>" +
+      "<li><strong>Chi-square / df:</strong> lower is better — χ²/df &lt; 3 is generally considered acceptable.</li>" +
+      "<li><strong>CFI, TLI:</strong> ≥0.90 acceptable, ≥0.95 good.</li>" +
+      "<li><strong>RMSEA:</strong> ≤0.08 acceptable, ≤0.05 good.</li>" +
+      "<li><strong>SRMR:</strong> ≤0.08 acceptable.</li>" +
+      "<li>These are reference thresholds only — consider several indices together rather than relying on any single one.</li>" +
+      "</ul>",
+    cbsem_guide_measurement_body:
+      "<ul>" +
+      "<li><strong>Cronbach's Alpha, Composite Reliability (CR), AVE:</strong> same reference thresholds as PLS-SEM — CR ≥0.7, AVE ≥0.5.</li>" +
+      "<li><strong>Factor Loadings:</strong> the Unstd./Std./SE/z/p columns — significance is tested via a z-test (Wald test) from the Maximum Likelihood estimate, unlike PLS-SEM (which always needs Bootstrap since it has no closed-form standard error).</li>" +
+      "</ul>",
+    cbsem_guide_structural_body:
+      "<ul>" +
+      "<li><strong>Unstd. (B):</strong> the unstandardized regression coefficient, in the original scale of the measure. <strong>Std. (β):</strong> the standardized coefficient, comparable across paths.</li>" +
+      "<li><strong>SE, z, p:</strong> significance is tested via a z-test (Wald test) directly from the Maximum Likelihood estimated covariance matrix — no Bootstrap needed, unlike PLS-SEM. A path is significant when p &lt; 0.05.</li>" +
+      "</ul>",
+    cbsem_guide_mediation_body:
+      "<ul>" +
+      "<li><strong>Total &amp; Indirect Effects:</strong> the indirect effect is the sum of the products of path coefficients along <em>every</em> route through a mediator between a pair of constructs; the total effect is direct + indirect.</li>" +
+      "<li><strong>Specific Indirect Effects:</strong> breaks out <em>each individual</em> mediated route — for CB-SEM this is a point estimate only, <strong>without</strong> its own significance test yet (that needs a dedicated method, e.g. the delta method/Sobel test, to derive a product's standard error).</li>" +
+      "<li><strong>Index of Moderated Mediation (Hayes, 2015):</strong> appears only when the model has both a mediator and a moderator acting on exactly one segment of that mediated route. This is the <em>slope</em> of the indirect effect with respect to the moderator — for CB-SEM also a point estimate only, without its own significance test yet.</li>" +
+      "</ul>",
+    cbsem_guide_r2cmb_summary: "R² & Common Method Bias",
+    cbsem_guide_r2cmb_body:
+      "<ul>" +
+      "<li><strong>R²:</strong> 0.19 weak, 0.33 moderate, 0.67 substantial (Chin, 1998) — CB-SEM's R² is usually higher than PLS-SEM's on the same data, since it corrects for measurement error.</li>" +
+      "<li><strong>Common Method Bias (Full collinearity VIF, Kock 2015):</strong> each construct is regressed on every other construct; VIF ≤ threshold (default 3.3) means no meaningful sign of common method bias.</li>" +
+      "</ul>",
+
+    lbl_q2_none: "No predictive relevance",
+    lbl_significant: "p < 0.05",
+    lbl_not_significant: "Not significant",
+    lbl_reference_indicator: "Reference indicator",
+    lbl_formative_note: "Formative (Mode B) — internal reliability metrics not applicable",
+    lbl_no_vif_pairs: "No construct has ≥2 predecessors / formative indicators to check collinearity.",
+    lbl_vif_high: "High (>5)",
+    lbl_vif_acceptable: "Acceptable",
+    lbl_cmb_ok: "No CMB concern",
+    lbl_cmb_warn: "Possible CMB concern",
+    lbl_fit_good: "Good",
+    lbl_fit_acceptable: "Acceptable",
+    lbl_fit_poor: "Poor",
+    suffix_structural: " (structural)",
+    suffix_formative_measurement: " (formative measurement)",
+
+    fit_chi_square: "Chi-square (χ²)",
+    fit_df: "Degrees of Freedom (df)",
+    fit_chi2_p: "χ² p-value",
+    fit_cfi: "CFI",
+    fit_tli: "TLI",
+    fit_rmsea: "RMSEA",
+    fit_srmr: "SRMR",
+    fit_gfi: "GFI",
+    fit_agfi: "AGFI",
+    fit_nfi: "NFI",
+    fit_aic: "AIC",
+    fit_bic: "BIC",
+
+    diagram_reflective: "Reflective",
+    diagram_formative: "Formative",
+  },
+};
+
+let currentLang = localStorage.getItem(LANG_STORAGE_KEY) || "en";
+if (!I18N[currentLang]) currentLang = "en";
+
+function t(key, params) {
+  const dict = I18N[currentLang] || I18N.vi;
+  let template = dict[key] !== undefined ? dict[key] : (I18N.vi[key] !== undefined ? I18N.vi[key] : key);
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      template = template.split(`{${k}}`).join(v);
+    }
+  }
+  return template;
+}
+
+function getLang() {
+  return currentLang;
+}
+
+function applyStaticTranslations() {
+  document.documentElement.lang = currentLang === "vi" ? "vi" : "en";
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    el.textContent = t(el.getAttribute("data-i18n"));
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+    el.setAttribute("placeholder", t(el.getAttribute("data-i18n-placeholder")));
+  });
+  document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+    el.innerHTML = t(el.getAttribute("data-i18n-html"));
+  });
+}
+
+function setLang(lang) {
+  if (!I18N[lang]) return;
+  currentLang = lang;
+  localStorage.setItem(LANG_STORAGE_KEY, lang);
+  applyStaticTranslations();
+  document.dispatchEvent(new CustomEvent("langchange", { detail: { lang } }));
+}
